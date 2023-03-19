@@ -5,7 +5,7 @@ This repo bootstraps a GitHub Codespace with necessary softwares for interacting
 - git
 - kubectl
 
-This could also be used for interacting with other resoruces on Oracle Cloud.
+This could also be used for interacting with other resources on Oracle Cloud.
 
 ## Pre-requsite
 1. Create an Oracle Cloud account
@@ -25,7 +25,13 @@ Allow group 'Default'/'Bastion Accounts' to read vcns in tenancy
 Note: here assumes a private cluster is created so bastion is requried
 
 ## Setup
-1. Fork this repo and create a GitHub codespace on the forked branch
+1. Fork this repo and create a GitHub codespace on the forked branch 
+- Pre-built image is also available, just specify in `devcontainer.json` when creating the codespace, e.g.
+```
+{
+  "image": "ghcr.io/jimsihk/codespace-oke-k8s:latest"
+}
+```
 2. Execute `./util/init-oci-local.sh` to
 - Setup oci configuration and create API key
 - Setup kubeconfig
