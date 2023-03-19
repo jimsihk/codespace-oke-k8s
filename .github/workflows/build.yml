@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_TAG: latest
+
+jobs:
+  build-container:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      packages: write # for docker/build-push-action to store image to package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to the Nightly Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: .devcontainer/self-build/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
