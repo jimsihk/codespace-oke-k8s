@@ -36,6 +36,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:.devcontainer/self-build/"
-          file: .devcontainer/self-build/Dockerfile
           push: true
           tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
