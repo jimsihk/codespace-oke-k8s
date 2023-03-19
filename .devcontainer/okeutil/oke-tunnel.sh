@@ -20,6 +20,11 @@
 
 clear
 
+################################
+# Step 0: Housekeep nohup.out
+################################
+echo > nohup.out
+
 if [ ! -f ~/.oci/custom-bastion-config ]
 then
   echo '*'" ERROR! Missing ~/.oci/custom-bastion-config, run init-local-oci.sh first! "'*'
@@ -27,7 +32,7 @@ then
 fi
 
 ################################
-# Step 0: Definitions
+# Step 0b: Definitions
 ################################
 
 # Change below for different bastion instance, connect to the Bastion that could connect to the nodes
@@ -43,7 +48,7 @@ TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2)
 TAEGET_PORT=6443
 
 ################################
-# Step 0: Fix key permission
+# Step 0c: Fix key permission
 ################################
 if [ -f "$PUBLIC_KEY" ]
 then

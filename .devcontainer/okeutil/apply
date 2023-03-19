@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
 # check if connection to k8s API is ready
-WKDIR=$(dirname "$(readlink -f basename "$0")")
-"$WKDIR"/util/check-oke-connection.sh
+/opt/okeutil/check-oke-connection.sh
 RESULT=$?
 if [ $RESULT -eq 0 ]
 then

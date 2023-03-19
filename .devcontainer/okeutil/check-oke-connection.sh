@@ -5,10 +5,8 @@ kubectl get nodes > /dev/null 2>&1
 RESULT=$?
 if [ $RESULT -eq 1 ]
 then
-    # get util path
-    WKDIR=$(dirname "$(readlink -f basename "$0")")
     echo "Initiating connection to k8s cluster at $(date)..."
-    TUNNELSCRIPT="$WKDIR/oke-tunnel.sh"
+    TUNNELSCRIPT="/opt/okeutil/oke-tunnel.sh"
     if [ ! -f "$TUNNELSCRIPT" ]
     then
         echo '* ERROR! Missing '"$TUNNELSCRIPT"
