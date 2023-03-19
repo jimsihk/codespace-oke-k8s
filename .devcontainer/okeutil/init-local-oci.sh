@@ -88,15 +88,19 @@ else
   echo '*'" Created ~/.oci/custom-bastion-config "'*'
 fi
 
-################################
 # Generate SSH key for tunnel
-################################
 ssh-keygen -b 2048 -t rsa
-echo "Enter private key path (e.g. ~/.ssh/id_rsa):"
+
+echo "Enter private key path ($HOME/.ssh/id_rsa):"
 read -r TEMP_PRIVATE_KEY
+if [ -z "$TEMP_PRIVATE_KEY" ]
+then
+  TEMP_PRIVATE_KEY="$HOME/.ssh/id_rsa"
+fi
 # covert ~ to absolute path
 # shellcheck disable=SC2001
 PRIVATE_KEY=$(echo "$TEMP_PRIVATE_KEY" | sed 's,~,'"$HOME"',g')
+
 PUBLIC_KEY="$PRIVATE_KEY.pub"
 echo "PRIVATE_KEY=$PRIVATE_KEY" >> ~/.oci/custom-bastion-config
 echo "PUBLIC_KEY=$PUBLIC_KEY" >> ~/.oci/custom-bastion-config
