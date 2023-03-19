@@ -68,7 +68,6 @@ if [ -z "$1" ]
 then
 	echo '* '"Creating Bastion session with $BASTION_ID..."
 	GETSESSIONCOMMAND="oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file $PUBLIC_KEY --key-type PUB --target-private-ip $TARGET_IP --target-port $TAEGET_PORT"
-	#RESULT1=`oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file ~/oci-ssh-public.pub --key-type PUB --target-private-ip 10.0.0.3 --target-port 6443`
 	RESULT1=$($GETSESSIONCOMMAND)
 	echo "$RESULT1"
 
@@ -85,7 +84,6 @@ sleep 10
 while true
 do
 	RESULT2=$(oci bastion session get --session-id "$SESSIONID")
-	#echo '*DEBUG* '$RESULT2
 
 	SSHTEMPLATE=$(echo "$RESULT2" | python3 -c 'import json,sys;print(json.load(sys.stdin)["data"]["ssh-metadata"]["command"])')
 	STATUS=$?
