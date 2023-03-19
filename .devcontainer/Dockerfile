@@ -2,10 +2,14 @@
 
 FROM ghcr.io/oracle/oci-cli:latest
 
-COPY kubernetes.repo /etc/yum.repos.d/
+USER root
+
+COPY build/cloud-shell/kubernetes.repo /etc/yum.repos.d/
 RUN dnf -y install git && rm -rf /var/cache/dnf/* \
     && yum install -y kubectl
 
 USER oracle
 WORKDIR /oracle
-RUN ln -s /workspaces workspaces
+RUN if [ -d /workspaces ]; then ln -s /workspaces workspaces; fi
+
+ENTRYPOINT sleep infinity
