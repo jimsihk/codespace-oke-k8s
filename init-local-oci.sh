@@ -96,7 +96,7 @@ echo "Enter private key path (e.g. ~/.ssh/id_rsa):"
 read -r TEMP_PRIVATE_KEY
 # covert ~ to absolute path
 # shellcheck disable=SC2001
-PRIVATE_KEY=$(echo "$TEMP_PRIVATE_KEY" | sed "s/\~/~/g")
+PRIVATE_KEY=$(echo "$TEMP_PRIVATE_KEY" | sed 's,~,'"$HOME"',g')
 PUBLIC_KEY="$PRIVATE_KEY.pub"
 echo "PRIVATE_KEY=$PRIVATE_KEY" >> ~/.oci/custom-bastion-config
 echo "PUBLIC_KEY=$PUBLIC_KEY" >> ~/.oci/custom-bastion-config

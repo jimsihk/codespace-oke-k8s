@@ -19,5 +19,6 @@ RUN dnf -y install git jq && rm -rf /var/cache/dnf/* \
 COPY kubernetes.repo /etc/yum.repos.d/
 RUN yum install -y kubectl
 
-WORKDIR /opt
 USER oracle
+
+WORKDIR /workspaces
