@@ -20,5 +20,5 @@ COPY kubernetes.repo /etc/yum.repos.d/
 RUN yum install -y kubectl
 
 USER oracle
-
-WORKDIR /workspaces
+WORKDIR /oracle
+RUN ln -s /workspaces workspaces
