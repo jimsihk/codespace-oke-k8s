@@ -1,9 +1,11 @@
 # GitHub Codespace for Oracle Cloud Container Engine for Kubernete
 
-This repo boostrap a GitHub Codespace with necessary softwares for interacting with Oracle Cloud Container Engine (OKE) for Kubernetes:
+This repo bootstraps a GitHub Codespace with necessary softwares for interacting with Oracle Cloud Container Engine for Kubernetes (OKE):
 - oci cli
 - git
 - kubectl
+
+This could also be used for interacting with other resoruces on Oracle Cloud.
 
 ## Pre-requsite
 1. Create an Oracle Cloud account
@@ -24,11 +26,11 @@ Note: here assumes a private cluster is created so bastion is requried
 
 ## Setup
 1. Fork this repo and create a GitHub codespace on the forked branch
-2. Execute `init-oci-local.sh` to
+2. Execute `./util/init-oci-local.sh` to
 - Setup oci configuration and create API key
 - Setup kubeconfig
 - Setup bastion session configuration with SSH key generation
-3. Execute `oke-tunnel.sh` for verification and adding the fingerprint for the first time, you should see something like this:
+3. Execute `./util/oke-tunnel.sh` for verification and adding the fingerprint for the first time, you should see something like this:
 ```
 ...
 Authenticated to host.bastion.eu-zurich-1.oci.oraclecloud.com ([X.X.X.X]:22) using "publickey".
