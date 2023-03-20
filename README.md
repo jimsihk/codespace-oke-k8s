@@ -4,6 +4,7 @@ This repo bootstraps a GitHub Codespace with necessary softwares for interacting
 - oci cli
 - git
 - kubectl
+- helm
 
 This could also be used for interacting with other resources on Oracle Cloud.
 

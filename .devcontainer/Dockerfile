@@ -1,11 +1,12 @@
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 FROM ghcr.io/oracle/oci-cli:latest
 
-# Install git and kubectl
+# Install git, kubectl, helm
 USER root
 COPY kubernetes.repo /etc/yum.repos.d/
 RUN dnf -y install git && rm -rf /var/cache/dnf/* \
-    && yum install -y kubectl
+    && yum install -y kubectl \
+    && curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
