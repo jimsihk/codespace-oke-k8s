@@ -57,13 +57,13 @@ debug1: pledge: filesystem
 ### Usage
 `/opt/okeutil/init-oci-local.sh` - initialize the oci command, kubectl command and tunnel connection
 
-`/opt/okeutil/oke-tunnel.sh` - establish the SSH tunnel to the K8S API endpoint
+`/opt/okeutil/oke-tunnel.sh` - establish the SSH tunnel to the K8S API endpoint, run with `nohup /opt/okeutil/oke-tunnel.sh &` to establish the tunnel in the background
 
 `/opt/okeutil/check-oke-connection.sh` - check if the SSH tunnel has been established
 
-`/opt/okeutil/apply` - same as `kubectl apply` but will detect if the tunnel has been established and establish if not
+`/opt/okeutil/apply` - same as `kubectl apply -f` with local files and will detect if the tunnel has been established and establish if not
 
-`/opt/okeutil/delete` - same as `kubectl delete` but will detect if the tunnel has been established and establish if not
+`/opt/okeutil/delete` - same as `kubectl delete -f` with local files and will detect if the tunnel has been established and establish if not
 
 ## Customization
 

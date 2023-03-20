@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: ["main"]
+    paths:
+      - '.devcontainer/**'
   schedule:
     - cron: '00 16 * * *' #UTC
 
