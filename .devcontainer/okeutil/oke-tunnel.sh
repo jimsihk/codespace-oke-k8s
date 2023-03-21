@@ -23,7 +23,7 @@ clear
 ################################
 # Step 0a: Clean up existing connection
 ################################
-kill $(pgrep --full bastionsession)
+kill $(pgrep --full bastionsession) > /dev/null 2>&1
 
 ################################
 # Step 0b: Housekeep nohup.out
