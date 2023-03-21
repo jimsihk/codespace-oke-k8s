@@ -21,7 +21,12 @@
 clear
 
 ################################
-# Step 0: Housekeep nohup.out
+# Step 0a: Clean up existing connection
+################################
+kill $(pgrep --full bastionsession)
+
+################################
+# Step 0b: Housekeep nohup.out
 ################################
 # always output the nohup.out at /workspace for GitHub codespace
 cd /workspace
@@ -34,7 +39,7 @@ then
 fi
 
 ################################
-# Step 0b: Definitions
+# Step 0c: Definitions
 ################################
 
 # Change below for different bastion instance, connect to the Bastion that could connect to the nodes
@@ -50,7 +55,7 @@ TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2)
 TAEGET_PORT=6443
 
 ################################
-# Step 0c: Fix key permission
+# Step 0d: Fix key permission
 ################################
 if [ -f "$PUBLIC_KEY" ]
 then
