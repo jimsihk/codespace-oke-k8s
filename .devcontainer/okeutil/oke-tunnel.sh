@@ -23,6 +23,8 @@ clear
 ################################
 # Step 0: Housekeep nohup.out
 ################################
+# always output the nohup.out at /workspace for GitHub codespace
+cd /workspace
 echo > nohup.out
 
 if [ ! -f ~/.oci/custom-bastion-config ]
