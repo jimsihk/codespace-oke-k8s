@@ -110,7 +110,7 @@ done
 ################################
 # Wait before really connecting
 sleep 5
-SSHCOMMAND=$(echo "$SSHTEMPLATE" | sed 's/ssh/ssh -v/g' | sed 's/<privateKey>/~\/oci-ssh-private.key/g' | sed 's/<localPort>/6443/g')
+SSHCOMMAND=$(echo "$SSHTEMPLATE" | sed 's/ssh/ssh -v/g' | sed "s/<privateKey>/$PRIVATE_KEY/g" | sed 's/<localPort>/6443/g')
 
 echo '* Running: '"$SSHCOMMAND"
 
