@@ -28,19 +28,26 @@ kill $(pgrep --full bastionsession) > /dev/null 2>&1
 ################################
 # Step 0b: Housekeep nohup.out
 ################################
-# always output the nohup.out at /workspace for GitHub codespace
-cd /workspaces
+# Always output the nohup.out at repo checkout path for GitHub codespace
+WKDIR="$HOME"
+if [ -n "$GITHUB_REPOSITORY" ]
+then
+  WKDIR=/workspaces/$(basename "$GITHUB_REPOSITORY")
+fi
+echo "nohup.out will be in $WKDIR..."
+cd "$WKDIR"
+# Clear previous log file
 echo > nohup.out
+
+################################
+# Step 0c: Definitions
+################################
 
 if [ ! -f ~/.oci/custom-bastion-config ]
 then
   echo '*'" ERROR! Missing ~/.oci/custom-bastion-config, run init-local-oci.sh first! "'*'
   exit 4
 fi
-
-################################
-# Step 0c: Definitions
-################################
 
 # Change below for different bastion instance, connect to the Bastion that could connect to the nodes
 BASTION_ID=$(grep BASTION_ID ~/.oci/custom-bastion-config | cut -d'=' -f2)
@@ -115,7 +122,7 @@ done
 ################################
 # Wait before really connecting
 sleep 5
-SSHCOMMAND=$(echo "$SSHTEMPLATE" | sed 's/ssh/ssh -v/g' | sed "s/<privateKey>/$PRIVATE_KEY/g" | sed 's/<localPort>/6443/g')
+SSHCOMMAND=$(echo "$SSHTEMPLATE" | sed 's/ssh/ssh -v/g' | sed "s/<privateKey>/${PRIVATE_KEY//\//\\/}/g" | sed 's/<localPort>/6443/g')
 
 echo '* Running: '"$SSHCOMMAND"
 
