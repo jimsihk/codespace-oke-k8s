@@ -1,12 +1,12 @@
 # GitHub Codespace for Oracle Cloud Container Engine for Kubernete
 
 This repo bootstraps a GitHub Codespace with necessary softwares for interacting with Oracle Cloud Container Engine for Kubernetes (OKE):
-- oci cli
+- oci [(Oracle Cloud Infrastructure Command Line Interface)](https://docs.oracle.com/iaas/Content/API/Concepts/cliconcepts.htm)
 - git
 - kubectl
 - helm
 
-This could also be used for interacting with other resources on Oracle Cloud.
+This could also be used for interacting with other resources on Oracle Cloud Infrastructure (OCI).
 
 ## How to use in GitHub Codespace
 
@@ -34,11 +34,12 @@ Note: here assumes a private cluster is created so bastion is required
   "image": "ghcr.io/jimsihk/codespace-oke-k8s:latest"
 }
 ```
-2. In the codespace, execute `/opt/okeutil/init-oci-local.sh` to
-- Setup oci configuration and create API key
+2. In the codespace, execute `/opt/okeutil/init-oci-local.sh` to setup OCI configuration and create API key
+3. Copy the generated public key value and add as a key under the OCI user on OCI portal
+4. In the codespace, execute `/opt/okeutil/init-oci-local.sh` again to further setup
 - Setup kubeconfig
 - Setup bastion session configuration with SSH key generation
-3. In the codespace, execute `/opt/okeutil/oke-tunnel.sh` for verification and adding the fingerprint for the first time, you should see something like this:
+5. In the codespace, execute `/opt/okeutil/oke-tunnel.sh` for verification and adding the fingerprint for the first time, then you should see something like this if successfully setup the tunnel:
 ```
 ...
 ...
@@ -51,15 +52,15 @@ debug1: channel 1: new [port listener]
 debug1: Entering interactive session.
 debug1: pledge: filesystem
 ```
-4. In the codespace, execute `/opt/okeutil/check-oke-connection.sh && echo $?` and it should return 0 if successful
-5. The codespace is ready for interacting with OKE!
+6. In the codespace, execute `/opt/okeutil/check-oke-connection.sh && echo $?` and it should return 0 if successful
+7. The codespace is ready for interacting with OKE!
 
 ### Usage
 `/opt/okeutil/init-oci-local.sh` - initialize the oci command, kubectl command and tunnel connection
 
 `/opt/okeutil/oke-tunnel.sh` - establish the SSH tunnel to the K8S API endpoint, run with `nohup /opt/okeutil/oke-tunnel.sh &` to establish the tunnel in the background
 
-`/opt/okeutil/check-oke-connection.sh` - check if the SSH tunnel has been established
+`/opt/okeutil/check-oke-connection.sh` - check if the SSH tunnel has been established and establish if not
 
 `/opt/okeutil/apply` - same as `kubectl apply -f` with local files and will detect if the tunnel has been established and establish if not
 
