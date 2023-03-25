@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 # check if connection to k8s API is ready
 /opt/okeutil/check-oke-connection.sh

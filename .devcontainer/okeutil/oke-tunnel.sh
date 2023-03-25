@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ################################
 # Utility to create a SSH tunnel in Oracle Cloud Bastion to access OKE nodes
 #

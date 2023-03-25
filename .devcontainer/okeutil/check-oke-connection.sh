@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 # check if connection to k8s API is ready
 kubectl get nodes > /dev/null 2>&1
