@@ -5,7 +5,7 @@ kubectl get nodes > /dev/null 2>&1
 RESULT=$?
 if [ $RESULT -eq 1 ]
 then
-    echo "Initiating connection to k8s cluster at $(date)..."
+    echo "Initiating connection to OKE cluster at $(date)..."
     TUNNELSCRIPT="/opt/okeutil/oke-tunnel.sh"
     if [ ! -f "$TUNNELSCRIPT" ]
     then

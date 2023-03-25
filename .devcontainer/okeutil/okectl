@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# check if connection to k8s API is ready
+/opt/okeutil/check-oke-connection.sh
+
+kubectl "$@"

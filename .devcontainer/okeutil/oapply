@@ -8,12 +8,19 @@ then
   # execute
   for YAML in "$@"
   do
-      if [ -f "$YAML" ]
-      then
-          kubectl delete -f "$YAML"
-      else
+    case "$YAML" in
+      http://)
+        ;;
+      https://)
+        ;;
+      *)
+        if [ ! -f "$YAML" ]
+        then
           echo "File [$YAML] not found"
           exit 1
-      fi
+        fi
+        ;;
+    esac
+    kubectl apply -f "$YAML"
   done
 fi
