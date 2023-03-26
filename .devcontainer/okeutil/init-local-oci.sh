@@ -91,14 +91,9 @@ else
 fi
 
 # Generate SSH key for tunnel
-ssh-keygen -b 2048 -t rsa
+TEMP_PRIVATE_KEY=~/.ssh/id_rsa_oci
+ssh-keygen -b 2048 -t rsa -N '' -f "$TEMP_PRIVATE_KEY"
 
-echo "Enter private key path ($HOME/.ssh/id_rsa):"
-read -r TEMP_PRIVATE_KEY
-if [ -z "$TEMP_PRIVATE_KEY" ]
-then
-  TEMP_PRIVATE_KEY="$HOME/.ssh/id_rsa"
-fi
 # covert ~ to absolute path
 # shellcheck disable=SC2001
 PRIVATE_KEY=$(echo "$TEMP_PRIVATE_KEY" | sed 's,~,'"$HOME"',g')
