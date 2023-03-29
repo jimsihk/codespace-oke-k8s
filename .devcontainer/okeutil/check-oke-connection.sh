@@ -12,6 +12,18 @@ then
         echo '* ERROR! Missing '"$TUNNELSCRIPT"
         exit 3
     fi
+
+    # Always output the nohup.out at repo checkout path for GitHub codespace
+    WKDIR="$HOME"
+    if [ -n "$GITHUB_REPOSITORY" ]
+    then
+      WKDIR=/workspaces/$(basename "$GITHUB_REPOSITORY")
+    fi
+    echo "nohup.out will be in $WKDIR..."
+    cd "$WKDIR"
+    # Clear previous log file
+    echo > nohup.out
+
     nohup "$TUNNELSCRIPT" 2>&1 &
     while true
     do
