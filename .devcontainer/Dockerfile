@@ -12,7 +12,7 @@ COPY --chown=oracle okeutil /opt/okeutil/
 
 USER oracle
 WORKDIR /oracle
-RUN if [ -d /workspaces ]; then ln -s /workspaces workspaces; fi \
+RUN if [ -d /workspaces ]; then ln -s /workspaces /oracle/workspaces; fi \
     && echo 'alias okectl=/opt/okeutil/okectl' >> /oracle/.bashrc \
     && echo 'alias oapply=/opt/okeutil/oapply' >> /oracle/.bashrc \
     && echo 'alias odelete=/opt/okeutil/odelete' >> /oracle/.bashrc
