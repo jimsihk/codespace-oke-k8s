@@ -9,9 +9,9 @@ then
   for YAML in "$@"
   do
     case "$YAML" in
-      http://)
+      http://*)
         ;;
-      https://)
+      https://*)
         ;;
       *)
         if [ ! -f "$YAML" ]
