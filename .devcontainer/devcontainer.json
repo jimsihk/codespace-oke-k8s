@@ -1,11 +1,16 @@
 {
   "build": { "dockerfile": "Dockerfile" },
   "customizations": {
-		"vscode": {
-			"extensions": [
-				"eamodio.gitlens",
-				"redhat.vscode-yaml"
-			]
-		}
-	}
+    "vscode": {
+        "extensions": [
+            "eamodio.gitlens",
+            "redhat.vscode-yaml",
+            "ms-azuretools.vscode-docker"
+        ],
+        "settings": {
+          "workbench.colorTheme": "Visual Studio Dark",
+          "editor.tabSize": 2
+        }
+    }
+  }
 }
