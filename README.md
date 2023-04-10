@@ -5,6 +5,8 @@ This repo bootstraps a GitHub Codespace with necessary softwares for interacting
 - git
 - kubectl
 - helm
+- k9s https://k9scli.io
+- kdash https://github.com/kdash-rs/kdash
 
 This could also be used for interacting with other resources on Oracle Cloud Infrastructure (OCI).
 
@@ -102,9 +104,15 @@ The container image will be built daily to keep packages up-to-date.
 7. The codespace is ready for interacting with OKE!
 
 #### Optional Settings
-8. Create Linux alias to replace `kubectl` with a customized version for OKE by executing `alias kubectl=/opt/okeutil/okectl`
+8. Create Linux alias to replace `kubectl` with a customized version for OKE by executing (could be useful if you would like to change to another shell):
+    ```
+    alias kubectl=/opt/okeutil/okectl
+    alias helm=/opt/okeutil/ohelm
+    ```
 
 ## Add-on Commands 
+Scripts are all under `/opt/okeutil/`:
+
 `/opt/okeutil/init-oci-local.sh`
 - initialize for the oci command, kubectl command and tunnel connection to OKE
 
@@ -117,6 +125,9 @@ The container image will be built daily to keep packages up-to-date.
 
 `okectl` or `/opt/okeutil/okectl`
 - same as `kubectl` and will detect if the tunnel has been established and establish if not
+
+`ohelm` or `/opt/okeutil/ohelm`
+- same as `helm` and will detect if the tunnel has been established and establish if not
 
 `oapply` or `/opt/okeutil/oapply`
 - perform `kubectl apply -f` for all supplied yaml files
