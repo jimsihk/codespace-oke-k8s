@@ -14,7 +14,8 @@ RUN ARCH=$(uname -m) && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    brew install derailed/k9s/k9s
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
@@ -27,13 +28,14 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s with working user as by default it will be installed to ~/.local
-    curl -sS https://webinstall.dev/k9s | bash && \
+    #curl -sS https://webinstall.dev/k9s | bash && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
     echo "- kubectl:" && \
     kubectl version --client && \
     echo "- helm: $(helm version)" && \
-    echo "- git: $(git --version)"
+    echo "- git: $(git --version)" && \
+    k9s info
 
 ENTRYPOINT sleep infinity
