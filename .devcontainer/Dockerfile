@@ -29,9 +29,9 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s with working user as by default it will be installed to ~/.local
     curl -sS https://webinstall.dev/k9s | bash && \
     # Verify
+    oci --version && \
     kubectl version --client && \
     helm version && \
-    git --version && \
-    kdash --version
+    git --version
 
 ENTRYPOINT sleep infinity
