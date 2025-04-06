@@ -37,6 +37,6 @@ RUN ln -s /workspaces ~/workspaces && \
     kubectl version --client && \
     echo "- helm: $(helm version)" && \
     echo "- git: $(git --version)" && \
-    echo "- k9s: $(k9s info|grep -i version)"
+    echo "- k9s: $(k9s version)"
 
 ENTRYPOINT sleep infinity
