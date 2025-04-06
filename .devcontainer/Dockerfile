@@ -26,14 +26,17 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bashrc && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
-    # Install k9s with working user as by default it will be installed to ~/.local
-    curl -sS https://webinstall.dev/k9s | bash && \
+    # Install k9s, with working user as by default it will be installed to ~/.local
+    curl -sS https://webi.sh/k9s | sh && \
+    source ~/.config/envman/PATH.env && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
     echo "- kubectl:" && \
     kubectl version --client && \
     echo "- helm: $(helm version)" && \
-    echo "- git: $(git --version)"
+    echo "- git: $(git --version)" && \
+    echo "- k9s:" && \
+    k9s version
 
 ENTRYPOINT sleep infinity
