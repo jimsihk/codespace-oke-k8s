@@ -29,8 +29,11 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s with working user as by default it will be installed to ~/.local
     curl -sS https://webinstall.dev/k9s | bash && \
     # Verify
-    oci --version && \
+    echo "Installed versions:" && \
+    echo "oci: $(oci --version)" && \
+    echo "kubectl:" && \
     kubectl version --client && \
+    echo "helm:" && \
     helm version && \
     git --version
 
