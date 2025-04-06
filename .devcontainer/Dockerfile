@@ -15,7 +15,7 @@ RUN ARCH=$(uname -m) && \
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
     curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    brew install derailed/k9s/k9s
+    pacman -S k9s
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
