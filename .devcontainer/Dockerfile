@@ -14,8 +14,7 @@ RUN ARCH=$(uname -m) && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    pacman -S k9s
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
@@ -29,6 +28,8 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s with working user as by default it will be installed to ~/.local
     #curl -sS https://webinstall.dev/k9s | bash && \
+    curl -sS https://webi.sh/k9s | sh && \
+    source ~/.config/envman/PATH.env && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
