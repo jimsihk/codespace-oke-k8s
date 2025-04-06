@@ -30,11 +30,10 @@ RUN ln -s /workspaces ~/workspaces && \
     curl -sS https://webinstall.dev/k9s | bash && \
     # Verify
     echo "Installed versions:" && \
-    echo "oci: $(oci --version)" && \
-    echo "kubectl:" && \
+    echo "- oci: $(oci --version)" && \
+    echo "- kubectl:" && \
     kubectl version --client && \
-    echo "helm:" && \
-    helm version && \
-    git --version
+    echo "- helm: $(helm version)" && \
+    echo "- git: $(git --version)"
 
 ENTRYPOINT sleep infinity
