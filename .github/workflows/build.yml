@@ -1,10 +1,14 @@
-name: Nightly Build
+name: Build
 
 on:
   push:
     tags: ['*']
-  schedule:
-    - cron: '00 16 * * *' #UTC
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - README.md
 
 permissions:
   contents: read
@@ -47,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:.devcontainer"
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           platforms: linux/amd64,linux/arm64
           provenance: false
