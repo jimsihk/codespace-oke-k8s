@@ -8,7 +8,7 @@ RUN ARCH=$(uname -m) && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    install -m 0755 kubectl /usr/local/bin/kubectl
 # Install git, helm, kdash
 RUN dnf -y install git && rm -rf /var/cache/dnf/* \
     && curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
