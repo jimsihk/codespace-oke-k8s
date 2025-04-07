@@ -63,6 +63,8 @@ RUN ARCH=$(uname -m) && \
     # Create user
     useradd -m -s /bin/bash oracle
 
+COPY --from=builder /usr/src/kdash-temp/kdash /usr/local/bin
+
 # Debug
 RUN ldd --version && id oracle
 
