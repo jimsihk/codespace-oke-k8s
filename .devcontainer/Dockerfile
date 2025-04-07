@@ -83,6 +83,7 @@ RUN ln -s /workspaces ~/workspaces && \
     source ~/.config/envman/PATH.env && \
     # Install kdash, with working user
     curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    echo 'alias kdash=/oracle/kdash' >> ~/.bashrc && \
     # Setup kdash with docker
     #echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
