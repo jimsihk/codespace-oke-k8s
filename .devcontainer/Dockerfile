@@ -23,11 +23,13 @@ RUN ARCH=$(uname -m) && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    dnf -y install dnf-plugins-core && \
-    dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
-    dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
-    systemctl enable --now docker && \
+    dnf -y install libxcb && \
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    # Install kdash by docker
+    #dnf -y install dnf-plugins-core && \
+    #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
+    #dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+    #systemctl enable --now docker && \
     # Create user
     useradd -m -s /bin/bash oracle
 
@@ -47,8 +49,8 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
     source ~/.config/envman/PATH.env && \
-    # Setup kdash
-    echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
+    # Setup kdash with docker
+    #echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
