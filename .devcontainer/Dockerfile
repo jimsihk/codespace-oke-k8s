@@ -16,7 +16,7 @@ RUN ARCH=$(uname -m) && \
     # Install oci-cli
     #dnf -y install oraclelinux-developer-release-el9 && \
     #dnf install python39-oci-cli && \
-    bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults && \
+    bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh) --accept-all-defaults" && \
     # Clean up
     rm -rf /var/cache/dnf/* && \
     # Install helm
