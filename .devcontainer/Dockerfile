@@ -1,7 +1,7 @@
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 #FROM ghcr.io/oracle/oci-cli:latest
-#FROM oraclelinux:9
-FROM almalinux:9
+FROM oraclelinux:9
+#FROM almalinux:9
 
 USER root
 # Install kubectl
@@ -14,16 +14,20 @@ RUN ARCH=$(uname -m) && \
     # Install git
     dnf -y install git && \
     # Install oci-cli
-    #dnf -y install oraclelinux-developer-release-el9 && \
-    #dnf install python39-oci-cli && \
-    curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
-    chmod +x install.sh && ./install.sh --accept-all-defaults && \
+    dnf -y install oraclelinux-developer-release-el9 && \
+    dnf install python39-oci-cli && \
+    #curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
+    #chmod +x install.sh && ./install.sh --accept-all-defaults && \
     # Clean up
     rm -rf /var/cache/dnf/* && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    dnf -y install dnf-plugins-core && \
+    dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
+    dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+    systemctl enable --now docker
     # Create user
     useradd -m -s /bin/bash oracle
 
@@ -43,6 +47,8 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
     source ~/.config/envman/PATH.env && \
+    # Setup kdash
+    echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
