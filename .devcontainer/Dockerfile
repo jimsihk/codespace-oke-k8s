@@ -23,7 +23,7 @@ RUN ARCH=$(uname -m) && \
     curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash
 
 # Debug
-RUN ldd --version
+RUN ldd --version && id oracle
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
