@@ -1,3 +1,33 @@
+# -----------------------------
+# Build Kdash base image
+# -----------------------------
+
+FROM oraclelinux:9 AS builder
+
+RUN dnf -y install git cargo
+
+WORKDIR /usr/src
+
+# Download and compile Rust dependencies in an empty project and cache as a separate Docker layer
+RUN USER=root cargo new --bin kdash-temp
+
+RUN git clone https://github.com/kdash-rs/kdash.git /tmp && ls -l /tmp
+
+WORKDIR /usr/src/kdash-temp
+RUN cp /tmp/Cargo.* .
+RUN cargo build --release
+# remove src from empty project
+RUN rm -r src
+# Copy actual source files and Build the app binary
+RUN mv /tmp/kdash/src ./src
+# remove previous deps
+RUN rm -r ./target/*/release/deps/kdash*
+
+RUN --mount=type=cache,target=/volume/target \
+    --mount=type=cache,target=/root/.cargo/registry \
+    cargo build --release --bin kdash
+RUN mv target/*/release/kdash .
+
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 #FROM ghcr.io/oracle/oci-cli:latest
 FROM oraclelinux:9
@@ -23,8 +53,8 @@ RUN ARCH=$(uname -m) && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    dnf -y install libxcb && \
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    #dnf -y install libxcb && \
+    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
     # Install kdash by docker
     #dnf -y install dnf-plugins-core && \
     #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
