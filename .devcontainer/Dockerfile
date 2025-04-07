@@ -2,31 +2,31 @@
 # Build Kdash base image
 # -----------------------------
 
-FROM oraclelinux:9 AS builder
+#FROM oraclelinux:9 AS builder
 
-RUN dnf -y install git cargo
+#RUN dnf -y install git cargo
 
-WORKDIR /usr/src
+#WORKDIR /usr/src
 
 # Download and compile Rust dependencies in an empty project and cache as a separate Docker layer
-RUN USER=root cargo new --bin kdash-temp
+#RUN USER=root cargo new --bin kdash-temp
 
-RUN git clone https://github.com/kdash-rs/kdash.git /tmp && ls -l /tmp
+#RUN git clone https://github.com/kdash-rs/kdash.git /tmp && ls -l /tmp
 
-WORKDIR /usr/src/kdash-temp
-RUN cp /tmp/Cargo.* .
-RUN cargo build --release
+#WORKDIR /usr/src/kdash-temp
+#RUN cp /tmp/Cargo.* .
+#RUN cargo build --release
 # remove src from empty project
-RUN rm -r src
+#RUN rm -r src
 # Copy actual source files and Build the app binary
-RUN mv /tmp/kdash/src ./src
+#RUN mv /tmp/kdash/src ./src
 # remove previous deps
-RUN rm -r ./target/*/release/deps/kdash*
+#RUN rm -r ./target/*/release/deps/kdash*
 
-RUN --mount=type=cache,target=/volume/target \
-    --mount=type=cache,target=/root/.cargo/registry \
-    cargo build --release --bin kdash
-RUN mv target/*/release/kdash .
+#RUN --mount=type=cache,target=/volume/target \
+#    --mount=type=cache,target=/root/.cargo/registry \
+#    cargo build --release --bin kdash
+#RUN mv target/*/release/kdash .
 
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 #FROM ghcr.io/oracle/oci-cli:latest
@@ -63,7 +63,7 @@ RUN ARCH=$(uname -m) && \
     # Create user
     useradd -m -s /bin/bash oracle
 
-COPY --from=builder /usr/src/kdash-temp/kdash /usr/local/bin
+#COPY --from=builder /usr/src/kdash-temp/kdash /usr/local/bin
 
 # Debug
 RUN ldd --version && id oracle
@@ -81,6 +81,8 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
     source ~/.config/envman/PATH.env && \
+    # Install kdash, with working user
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
     # Setup kdash with docker
     #echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
