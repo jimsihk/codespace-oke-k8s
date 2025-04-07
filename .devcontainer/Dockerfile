@@ -55,11 +55,11 @@ RUN ARCH=$(uname -m) && \
     # Install kdash
     #dnf -y install libxcb && \
     #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    # Install kdash by docker
-    #dnf -y install dnf-plugins-core && \
-    #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
-    #dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
-    #systemctl enable --now docker && \
+    # Install docker
+    dnf -y install dnf-plugins-core && \
+    dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
+    dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+    systemctl enable docker && \
     # Create user
     useradd -m -s /bin/bash oracle
 
@@ -93,6 +93,7 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- helm: $(helm version)" && \
     echo "- git: $(git --version)" && \
     echo "- k9s:" && k9s version && \
-    echo "- kdash:" && ./kdash --version
+    echo "- docker: $(docker version --format '{{.Client.APIVersion}}')" && \
+    echo "- kdash:" && kdash --version
 
 ENTRYPOINT sleep infinity
