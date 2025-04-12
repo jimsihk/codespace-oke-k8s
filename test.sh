@@ -2,11 +2,22 @@
 
 set -eo pipefail
 
-ls -l ~/.local/bin/
-ls -l ~/.local/opt/
-cat ~/.bashrc
+echo "Current user: $(whoami)"
+echo "Current directory: $(pwd)"
 
+echo '****************'
+echo '~/.local/bin/:'
+ls -la ~/.local/bin/
+echo '****************'
+echo '~/.local/opt/:'
+ls -la ~/.local/opt/
+echo '****************'
+echo '~/.bashrc:'
+cat ~/.bashrc
+echo '****************'
+echo 'env:'
 env
+echo '****************'
 
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
