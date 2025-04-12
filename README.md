@@ -10,10 +10,6 @@ This repo bootstraps a GitHub Codespace with necessary softwares for interacting
 
 This could also be used for interacting with other resources on Oracle Cloud Infrastructure (OCI).
 
-The container image will be built daily to keep packages up-to-date.
-
-[![Build](https://github.com/jimsihk/codespace-oke-k8s/actions/workflows/build.yml/badge.svg)](https://github.com/jimsihk/codespace-oke-k8s/actions/workflows/build.yml)
-
 ## How to use in GitHub Codespace
 
 ### Pre-requisite
@@ -42,12 +38,12 @@ The container image will be built daily to keep packages up-to-date.
     }
     ```
 #### Setup local environment for OKE
-2. In the codespace, execute `/opt/okeutil/init-oci-local.sh` to setup OCI configuration and create API key
+2. In the codespace, execute `init-oci-local.sh` to setup OCI configuration and create API key
 3. Copy the generated public key value and add as a key under the OCI user on OCI portal
-4. In the codespace, execute `/opt/okeutil/init-oci-local.sh` again to further setup
+4. In the codespace, execute `init-oci-local.sh` again to further setup
     - Setup kubeconfig
     - Setup bastion session configuration with SSH key generation
-5. In the codespace, execute `/opt/okeutil/check-oke-connection.sh && echo $?` for verification
+5. In the codespace, execute `check-oke-connection.sh && echo $?` for verification
     - when you see the prompt like below to add RSA key fingerprint, type `yes`:
       ```
       ...
@@ -111,30 +107,30 @@ The container image will be built daily to keep packages up-to-date.
     ```
 
 ## Add-on Commands 
-Scripts are all under `/opt/okeutil/`:
+Actual scripts are located under `/opt/okeutil/`:
 
-`/opt/okeutil/init-oci-local.sh`
+`init-oci-local.sh`
 - initialize for the oci command, kubectl command and tunnel connection to OKE
 
-`/opt/okeutil/oke-tunnel.sh`
-- establish the SSH tunnel to the K8S API endpoint, run with `nohup /opt/okeutil/oke-tunnel.sh &` to establish the tunnel in the background
+`oke-tunnel.sh`
+- establish the SSH tunnel to the K8S API endpoint, run with `nohup oke-tunnel.sh &` to establish the tunnel in the background
 
-`/opt/okeutil/check-oke-connection.sh`
+`check-oke-connection.sh`
 - check if the SSH tunnel has been established and establish if not
 - tunnel connection log will be at _/workplaces/<repo_name>/nohup.out_ (or _$HOME/nohup.out_ if not on Github codespace)
 
-`okectl` or `/opt/okeutil/okectl`
+`okectl`
 - same as `kubectl` and will detect if the tunnel has been established and establish if not
 
-`ohelm` or `/opt/okeutil/ohelm`
+`ohelm`
 - same as `helm` and will detect if the tunnel has been established and establish if not
 
-`oapply` or `/opt/okeutil/oapply`
+`oapply`
 - perform `kubectl apply -f` for all supplied yaml files
 - detect if the tunnel has been established and establish if not
 - e.g. `oapply pod1.yaml pod2.yaml` will apply both resource of pod1 and pod2
 
-`odelete` or `/opt/okeutil/odelete`
+`odelete`
 - perform `kubectl delete -f` for all supplied yaml files
 - detect if the tunnel has been established and establish if not
 - e.g. `odelete pod1.yaml pod2.yaml` will delete both resource of pod1 and pod2
