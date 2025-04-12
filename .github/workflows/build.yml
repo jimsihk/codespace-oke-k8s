@@ -66,17 +66,10 @@ jobs:
 
       - name: Test
         run: |
-          #RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?")"
-          #echo "Run result:"
-          #echo "${RESULT}"
-          #STATUS="$(echo $RESULT | tail -1)"
-          docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?" > /tmp/test_result.txt 2>&1
+          docker run --rm -v $(pwd)/test.sh:/mnt/test.sh ${{ env.IMAGE_NAME }}:test "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
           echo "---"
           cat /tmp/test_result.txt
           echo "---"
-          #docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?"
-          #STATUS="$(echo $?)"
-          #echo "Status=${STATUS}"
           STATUS="$(cat /tmp/test_result.txt | tail -1)"
           exit "${STATUS}"
 
