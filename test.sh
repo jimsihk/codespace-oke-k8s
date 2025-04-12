@@ -19,6 +19,11 @@ echo 'env:'
 env
 echo '****************'
 
+which okectl
+which ohelm
+which oapply
+which odelete
+
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
 echo "- kubectl:" && kubectl version --client
