@@ -39,7 +39,7 @@ USER root
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git
+    apt-get install -y curl git python3-all
 
 # Install kubectl
 RUN ARCH=$(uname -m) && \
