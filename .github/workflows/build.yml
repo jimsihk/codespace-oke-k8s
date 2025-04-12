@@ -71,8 +71,10 @@ jobs:
           echo "Before:"
           docker image ls -a
           docker image history "${{ env.IMAGE_NAME }}:test"
+
+          echo "Trying to slim..."
+          slim build --target ${{ env.IMAGE_NAME }}:test --http-probe=false
           
-          slim build --target ${{ env.IMAGE_NAME }}:test
           echo "After:"
           docker image ls -a
           docker image history "${{ env.IMAGE_NAME }}:test"
