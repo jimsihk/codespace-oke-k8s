@@ -28,6 +28,9 @@ echo "- kdash: $(kdash --version)"
 
 echo '****************'
 echo "Testing oke-tunnel.sh:"
+oke-tunnel.sh
+echo $?
+echo "==="
 if ! oke-tunnel.sh; then
   exit_code=$?
   echo "$exit_code"
