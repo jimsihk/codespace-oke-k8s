@@ -66,7 +66,7 @@ jobs:
 
       - name: Test
         run: |
-          docker run --rm -v $(pwd)/version.sh:/version.sh ${{ env.IMAGE_NAME }}:test /bin/bash -c "chmod +x /version.sh && /version.sh; echo \$?"
+          docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test /bin/bash -c "chmod +x /version.sh && /version.sh; echo \$?"
 
       - name: Push
         uses: docker/build-push-action@v6
