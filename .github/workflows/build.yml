@@ -45,7 +45,7 @@ jobs:
             VERSION=test-${ARCH}
           fi
 
-          TAG="${IMAGE_FULL_NAME}:${VERSION}"
+          TAG="${{ env.IMAGE_NAME }}:${VERSION}"
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           
           TAGS="${IMAGE_FULL_NAME}:${VERSION}"
@@ -132,8 +132,8 @@ jobs:
           fi
           IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
           docker manifest create $IMAGE_FULL_NAME:$VERSION \
-            $IMAGE_FULL_NAME:$VERSION-amd \
-            $IMAGE_FULL_NAME:$VERSION-arm
+            ${{ env.IMAGE_NAME }}:$VERSION-amd \
+            ${{ env.IMAGE_NAME }}:$VERSION-arm
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
