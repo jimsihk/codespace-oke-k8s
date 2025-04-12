@@ -90,7 +90,7 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
-    source ~/.config/envman/PATH.env && \
+    . ~/.config/envman/PATH.env && \
     # Install kdash, with working user
     #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
     #echo 'alias kdash=/oracle/kdash' >> ~/.bashrc && \
