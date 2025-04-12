@@ -35,4 +35,4 @@ RUN ln -s /workspaces ~/workspaces && \
 
 # Launch bash as login shell to always load the .bashrc
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
-CMD ["sleep infinity"]
+CMD ["echo Started at $(date) && sleep infinity"]
