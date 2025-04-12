@@ -67,10 +67,10 @@ jobs:
       - name: Test
         run: |
           RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?")"
-          echo "Run result: ${RESULT}"
-          if [ "${RESULT}" != '0' ]; then
-            exit 1
-          fi
+          echo "Run result:"
+          echo "${RESULT}"
+          STATUS="$(echo $RESULT | tail -1)"
+          exit "${STATUS}"
 
       - name: Multi-arch build and push
         uses: docker/build-push-action@v6
