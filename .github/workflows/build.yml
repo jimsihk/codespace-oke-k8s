@@ -66,7 +66,7 @@ jobs:
 
       - name: Slim image
         run: |
-          curl -sL https://raw.githubusercontent.com/slimtoolkit/slim/master/scripts/install-slim.sh | bash
+          curl -sL https://raw.githubusercontent.com/slimtoolkit/slim/master/scripts/install-slim.sh | sudo -E bash -
           echo "Before:"
           docker image ls -a
           docker image history "${{ env.IMAGE_NAME }}:test"
