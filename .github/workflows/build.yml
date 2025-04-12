@@ -63,6 +63,7 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:test
           platforms: ${{ env.IMAGE_PLATFORM }}
           provenance: false
+          load: true
 
       - name: Test
         run: |
