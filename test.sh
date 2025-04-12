@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. ~/.bashrc
-
 set -eo pipefail
 
 echo "Current user: $(whoami)"
@@ -22,9 +20,6 @@ env
 echo '****************'
 echo 'alias:'
 alias
-echo '****************'
-echo '[ -s "$HOME/.config/envman/load.sh" ]'
-echo $([ -s "$HOME/.config/envman/load.sh" ])
 echo '****************'
 
 echo "Installed versions:"
