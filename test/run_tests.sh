@@ -8,7 +8,7 @@ fi
 
 echo "Testing ${TEST_IMAGE}..."
 
-docker run --rm -v $(pwd)/test/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
+docker run --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
 echo "---"
 cat /tmp/test_result.txt
 echo "---"
