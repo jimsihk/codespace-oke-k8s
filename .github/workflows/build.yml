@@ -55,7 +55,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:.devcontainer"
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
+          platforms: ${{ env.IMAGE_PLATFORM }}
+          provenance: false
+
+      - name: Test
+        run: |
+          docker run --rm -v $(pwd)/version.sh:/version.sh ${{ env.IMAGE_NAME }}:test /bin/bash -c "chmod +x /version.sh && /version.sh; echo \$?"
+
+      - name: Push
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:.devcontainer"
@@ -63,3 +76,4 @@ jobs:
           tags: ${{ steps.prepare.outputs.tags }}
           platforms: ${{ env.IMAGE_PLATFORM }}
           provenance: false
+  
