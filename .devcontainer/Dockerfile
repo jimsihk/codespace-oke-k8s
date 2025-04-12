@@ -25,22 +25,13 @@ USER oracle
 WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces && \
-    echo 'echo ***LOADING bashrc...' >> ~/.bashrc && \
     echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bashrc && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bashrc && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
-    # Install k9s, with working user as by default it will be installed to ~/.local
-    curl -sS https://webi.sh/k9s | sh && \
-    . ~/.config/envman/PATH.env && \
-    # Verify
-    echo "Installed versions:" && \
-    echo "- oci: $(oci --version)" && \
-    echo "- kubectl:" && kubectl version --client && \
-    echo "- helm: $(helm version)" && \
-    echo "- git: $(git --version)" && \
-    echo "- k9s:" && k9s version && \
-    echo "- kdash: $(kdash --version)"
+    # Install k9s, with working user as webi will update .bashrc of current user
+    curl -sS https://webi.sh/k9s | sh
 
+# Launch bash as login shell to always load the .bashrc
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["sleep", "infinity"]
