@@ -29,15 +29,7 @@ echo "- kdash: $(kdash --version)"
 echo '****************'
 echo "Testing oke-tunnel.sh:"
 oke-tunnel.sh && exit_code=0 || exit_code=$?
-#echo $?
-#echo "==="
-#if ! oke-tunnel.sh; then
-#  exit_code=$?
-  echo "$exit_code"
-#else
-#  exit_code=$?
-#  echo "else: $exit_code"
-#fi
+echo "$exit_code"
 if [ "$exit_code" -eq 4 ]; then
   echo "Passed"
 else
