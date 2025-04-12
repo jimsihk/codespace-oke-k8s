@@ -22,7 +22,7 @@ unset STATUS
 echo "....."
 
 echo "=====Test entrypoint====="
-CONTAINER_ID=$(docker run --rm --name t_entrypt -d "${TEST_IMAGE}")
+CONTAINER_ID=$(docker run --rm -d "${TEST_IMAGE}")
 docker ps
 docker logs --details "${CONTAINER_ID}"
 echo "Wait for 10s..." && sleep 10
