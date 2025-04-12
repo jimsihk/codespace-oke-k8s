@@ -29,3 +29,8 @@ echo "- helm: $(helm version)"
 echo "- git: $(git --version)"
 echo "- k9s:" && k9s version
 echo "- kdash: $(kdash --version)"
+
+ls -l okectl
+
+echo "Testing oke-tunnel.sh"
+oke-tunnel.sh
