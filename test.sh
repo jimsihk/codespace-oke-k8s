@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ~/.bashrc
+
 set -eo pipefail
 
 echo "Current user: $(whoami)"
