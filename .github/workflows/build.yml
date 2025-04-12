@@ -19,7 +19,7 @@ jobs:
   build-container:
     permissions:
       contents: read
-      packages: write
+      #packages: write
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
@@ -47,7 +47,6 @@ jobs:
           else
             ARCH=amd
           fi
-          echo "arch=${ARCH}"
           echo "arch=${ARCH}" >> $GITHUB_OUTPUT
 
       - name: Log in to the Container registry
@@ -73,12 +72,11 @@ jobs:
           push: false
           tags: ${{ env.IMAGE_NAME }}:test
           provenance: false
-          load: true
           outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
 
       - name: Test
         run: |
-          pwd
+          docker load --input ${{ runner.temp }}/myimage.tar
           cd test
           ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
           cd ..
@@ -105,6 +103,7 @@ jobs:
       - name: Load images
         run: |
           docker load --input ${{ runner.temp }}/myimage-amd.tar
+          docker image ls -a
           docker load --input ${{ runner.temp }}/myimage-arm.tar
           docker image ls -a
 
