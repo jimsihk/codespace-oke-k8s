@@ -42,3 +42,4 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- kdash: $(kdash --version)"
 
 ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["sleep", "infinity"]
