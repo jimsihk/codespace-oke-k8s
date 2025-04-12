@@ -38,7 +38,7 @@ USER root
 
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install -y git
+    apt-get install -y curl git
 
 # Install kubectl
 RUN ARCH=$(uname -m) && \
