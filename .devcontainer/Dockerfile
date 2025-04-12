@@ -39,7 +39,7 @@ USER root
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git python3-full
+    apt-get install -y curl git
 
 # Install kubectl
 RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
@@ -53,8 +53,8 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     # Install oci-cli
     #dnf -y install oraclelinux-developer-release-el9 && \
     #dnf install python39-oci-cli && \
-    curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
-    chmod +x install.sh && ./install.sh --accept-all-defaults && \
+    #curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
+    #chmod +x install.sh && ./install.sh --accept-all-defaults && \
     # Following pre-built image, https://github.com/oracle/oci-cli/issues/710
     #python3 -m pip install --no-cache-dir --upgrade pip && \
     #python3 -m pip install --no-cache-dir oci-cli && \
@@ -99,7 +99,7 @@ RUN ln -s /workspaces ~/workspaces && \
     #echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
     echo "Installed versions:" && \
-    echo "- oci: $(oci --version)" && \
+    #echo "- oci: $(oci --version)" && \
     echo "- kubectl:" && kubectl version --client && \
     echo "- helm: $(helm version)" && \
     echo "- git: $(git --version)" && \
