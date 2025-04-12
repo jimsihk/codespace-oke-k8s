@@ -18,11 +18,12 @@ echo '****************'
 echo 'env:'
 env
 echo '****************'
-
-type okectl
-type ohelm
-type oapply
-type odelete
+echo 'alias:'
+alias
+echo '****************'
+echo '[ -s "$HOME/.config/envman/load.sh" ]'
+echo $([ -s "$HOME/.config/envman/load.sh" ])
+echo '****************'
 
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
