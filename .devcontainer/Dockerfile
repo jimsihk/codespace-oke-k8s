@@ -42,5 +42,9 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- k9s:" && k9s version && \
     echo "- kdash: $(kdash --version)"
 
+# Debug
+RUN cat ~/.bashrc
+RUN cat ~/.config/envman/PATH.env
+
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["sleep", "infinity"]
