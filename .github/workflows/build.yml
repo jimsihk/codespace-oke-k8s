@@ -89,6 +89,7 @@ jobs:
           path: ${{ runner.temp }}/myimage.tar
 
   push-container:
+    needs: [build-container]
     permissions:
       contents: read
       packages: write
