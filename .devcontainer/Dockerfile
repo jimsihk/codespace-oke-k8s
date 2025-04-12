@@ -41,4 +41,4 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- k9s:" && k9s version && \
     echo "- kdash: $(kdash --version)"
 
-ENTRYPOINT sleep infinity
+ENTRYPOINT ["/bin/bash"]
