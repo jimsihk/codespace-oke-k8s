@@ -70,8 +70,13 @@ jobs:
           #echo "Run result:"
           #echo "${RESULT}"
           #STATUS="$(echo $RESULT | tail -1)"
+          docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?" > /tmp/test_result.txt
+          echo "---"
+          cat /tmp/test_result.txt | tail -1
+          echo "---"
           docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?"
           STATUS="$(echo $?)"
+          echo "Status=${STATUS}"
           exit "${STATUS}"
 
       - name: Multi-arch build and push
