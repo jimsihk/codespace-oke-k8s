@@ -19,10 +19,10 @@ echo 'env:'
 env
 echo '****************'
 
-ls -l okectl
-ls -l ohelm
-ls -l oapply
-ls -l odelete
+type okectl
+type ohelm
+type oapply
+type odelete
 
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
