@@ -19,10 +19,10 @@ echo 'env:'
 env
 echo '****************'
 
-which okectl
-which ohelm
-which oapply
-which odelete
+ls -l okectl
+ls -l ohelm
+ls -l oapply
+ls -l odelete
 
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
