@@ -2,6 +2,12 @@
 
 set -eo pipefail
 
+ls -l ~/.local/bin/
+ls -l ~/.local/opt/
+cat ~/.bashrc
+
+env
+
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
 echo "- kubectl:" && kubectl version --client
