@@ -66,6 +66,7 @@ jobs:
 
       - name: Test
         run: |
+          pwd
           cd test
           ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
           cd ..
