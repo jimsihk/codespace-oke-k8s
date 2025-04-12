@@ -64,9 +64,21 @@ jobs:
           provenance: false
           load: true
 
+      - name: Slim image
+        run: |
+          curl -sL https://raw.githubusercontent.com/slimtoolkit/slim/master/scripts/install-slim.sh | bash
+          echo "Before:"
+          docker image ls -a
+          docker image history "${{ env.IMAGE_NAME }}:test"
+          
+          slim build --target ${{ env.IMAGE_NAME }}:test
+          echo "After:"
+          docker image ls -a
+          docker image history "${{ env.IMAGE_NAME }}:test"
+
       - name: Test
         run: |
-          docker image history "${{ env.IMAGE_NAME }}:test"
+          #docker image history "${{ env.IMAGE_NAME }}:test"
           cd test
           ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
           cd ..
