@@ -6,22 +6,18 @@ echo "Current user: $(whoami)"
 echo "Current directory: $(pwd)"
 
 echo '****************'
-echo '~/.local/bin/:'
-ls -la ~/.local/bin/
-echo '****************'
-echo '~/.local/opt/:'
-ls -la ~/.local/opt/
-echo '****************'
 echo '~/.bashrc:'
 cat ~/.bashrc
+
 echo '****************'
 echo 'env:'
 env
+
 echo '****************'
 echo 'alias:'
 alias
-echo '****************'
 
+echo '****************'
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
 echo "- kubectl:" && kubectl version --client
@@ -30,5 +26,16 @@ echo "- git: $(git --version)"
 echo "- k9s:" && k9s version
 echo "- kdash: $(kdash --version)"
 
-echo "Testing oke-tunnel.sh"
-oke-tunnel.sh
+echo '****************'
+echo "Testing oke-tunnel.sh:"
+if ! oke-tunnel.sh; then
+  exit_code=$?
+else
+  exit_code=0
+fi
+if [ "$exit_code" -eq 4 ]; then
+  echo "Passed"
+else
+  echo "Failed"
+  exit "$exit_code"
+fi
