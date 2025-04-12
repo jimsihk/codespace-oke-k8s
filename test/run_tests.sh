@@ -24,9 +24,13 @@ echo "....."
 echo "=====Test entrypoint====="
 docker run --rm --name t_entrypt -d "${TEST_IMAGE}"
 docker ps
-sleep 10
-docker ps
-sleep 60
+docker logs --details t_entrypt
+echo "Wait for 10s..." && sleep 10
 docker ps
 docker logs --details t_entrypt
+echo "Wait for 30s..." && sleep 30
+docker ps
+docker logs --details t_entrypt
+echo "Kill the container..."
 docker kill t_entrypt
+echo "....."
