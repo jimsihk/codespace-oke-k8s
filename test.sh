@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefall
+set -eo pipefail
 
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
