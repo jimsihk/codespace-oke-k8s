@@ -66,12 +66,7 @@ jobs:
 
       - name: Test
         run: |
-          docker run --rm -v $(pwd)/test.sh:/mnt/test.sh ${{ env.IMAGE_NAME }}:test "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
-          echo "---"
-          cat /tmp/test_result.txt
-          echo "---"
-          STATUS="$(cat /tmp/test_result.txt | tail -1)"
-          exit "${STATUS}"
+          ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
 
       - name: Multi-arch build and push
         uses: docker/build-push-action@v6
