@@ -66,7 +66,7 @@ jobs:
 
       - name: Test
         run: |
-          ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
+          ./test/run_tests.sh "${{ env.IMAGE_NAME }}:test"
 
       - name: Multi-arch build and push
         uses: docker/build-push-action@v6
