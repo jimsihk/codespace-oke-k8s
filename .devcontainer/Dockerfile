@@ -53,18 +53,19 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     # Install oci-cli
     #dnf -y install oraclelinux-developer-release-el9 && \
     #dnf install python39-oci-cli && \
-    curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
-    chmod +x install.sh && ./install.sh --accept-all-defaults && \
+    #curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
+    #chmod +x install.sh && ./install.sh --accept-all-defaults && \
     # Following pre-built image, https://github.com/oracle/oci-cli/issues/710
-    #python3 -m pip install --no-cache-dir --upgrade pip && \
-    #python3 -m pip install --no-cache-dir oci-cli && \
+    python3 -m pip install --no-cache-dir --upgrade pip && \
+    python3 -m pip install --no-cache-dir oci-cli && \
     # Clean up
     #rm -rf /var/cache/dnf/* && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
     #dnf -y install libxcb && \
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | bash && \
     # Install docker
     #dnf -y install dnf-plugins-core && \
     #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
