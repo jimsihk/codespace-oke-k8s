@@ -118,7 +118,6 @@ jobs:
 
       - name: Load images
         run: |
-          ls -l ${{ runner.temp }}/*
           docker load --input ${{ runner.temp }}/myimage-amd/myimage.tar
           docker image ls -a
           docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
