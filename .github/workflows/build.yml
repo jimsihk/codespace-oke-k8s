@@ -32,15 +32,6 @@ jobs:
         id: prepare
         run: |
           IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
-          VERSION=${GITHUB_REF#refs/*/}
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            VERSION=test
-          fi
-          TAGS="${IMAGE_FULL_NAME}:${VERSION}"
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
-          fi
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
           if [[ ${{ matrix.os }} == *"-arm" ]]; then
             ARCH=arm
@@ -48,6 +39,20 @@ jobs:
             ARCH=amd
           fi
           echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          
+          VERSION=${GITHUB_REF#refs/*/}-${ARCH}
+          if [ ${{ github.event_name == 'pull_request' }} ]; then
+            VERSION=test-${ARCH}
+          fi
+
+          TAG="${IMAGE_FULL_NAME}:${VERSION}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          
+          TAGS="${IMAGE_FULL_NAME}:${VERSION}"
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
+          fi
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Log in to the Container registry
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
@@ -70,16 +75,16 @@ jobs:
         with:
           context: "{{defaultContext}}:.devcontainer"
           push: false
-          tags: ${{ env.IMAGE_NAME }}:test
+          tags: ${{ steps.prepare.outputs.tag }}
           provenance: false
           outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
 
       - name: Test
         run: |
           docker load --input ${{ runner.temp }}/myimage.tar
-          docker image history "${{ env.IMAGE_NAME }}:test"
+          docker image history "${{ steps.prepare.outputs.tag }}"
           cd test
-          ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
+          ./run_tests.sh "${{ steps.prepare.outputs.tag }}"
           cd ..
 
       - name: Upload artifact
