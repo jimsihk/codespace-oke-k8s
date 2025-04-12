@@ -39,7 +39,7 @@ USER root
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git source python3-all
+    apt-get install -y curl git python3-all
 
 # Install kubectl
 RUN ARCH=$(uname -m) && \
@@ -54,7 +54,7 @@ RUN ARCH=$(uname -m) && \
     #dnf -y install oraclelinux-developer-release-el9 && \
     #dnf install python39-oci-cli && \
     curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
-    chmod +x install.sh && ./install.sh --accept-all-defaults && \
+    chmod +x install.sh && bash -c ./install.sh --accept-all-defaults && \
     # Following pre-built image, https://github.com/oracle/oci-cli/issues/710
     #python3 -m pip install --no-cache-dir --upgrade pip && \
     #python3 -m pip install --no-cache-dir oci-cli && \
