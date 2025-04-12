@@ -17,7 +17,7 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
     # Force to install musl version to avoid GLIBC error
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux\(.*\)\.tar\.gz'/SUFFIX='linux-musl.tar.gz'/" | bash
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/g" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
