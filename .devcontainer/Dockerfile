@@ -32,14 +32,14 @@
 #FROM ghcr.io/oracle/oci-cli:latest
 #FROM oraclelinux:9
 #FROM almalinux:9
-FROM debian:stable-slim
+FROM debian:stable
 
 USER root
 
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git python3 python3-pip
+    apt-get install -y curl git
 
 # Install kubectl
 RUN ARCH=$(uname -m) && \
