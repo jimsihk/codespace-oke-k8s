@@ -66,10 +66,12 @@ jobs:
 
       - name: Test
         run: |
-          RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?")"
-          echo "Run result:"
-          echo "${RESULT}"
-          STATUS="$(echo $RESULT | tail -1)"
+          #RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?")"
+          #echo "Run result:"
+          #echo "${RESULT}"
+          #STATUS="$(echo $RESULT | tail -1)"
+          docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?"
+          STATUS="$(echo $?)"
           exit "${STATUS}"
 
       - name: Multi-arch build and push
