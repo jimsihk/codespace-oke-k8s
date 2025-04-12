@@ -22,15 +22,15 @@ unset STATUS
 echo "....."
 
 echo "=====Test entrypoint====="
-docker run --rm --name t_entrypt -d "${TEST_IMAGE}"
+CONTAINER_ID=$(docker run --rm --name t_entrypt -d "${TEST_IMAGE}")
 docker ps
-docker logs --details t_entrypt
+docker logs --details "${CONTAINER_ID}"
 echo "Wait for 10s..." && sleep 10
 docker ps
-docker logs --details t_entrypt
+docker logs --details "${CONTAINER_ID}"
 echo "Wait for 30s..." && sleep 30
 docker ps
-docker logs --details t_entrypt
+docker logs --details "${CONTAINER_ID}"
 echo "Kill the container..."
-docker kill t_entrypt
+docker kill "${CONTAINER_ID}"
 echo "....."
