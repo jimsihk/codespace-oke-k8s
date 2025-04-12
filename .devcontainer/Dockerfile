@@ -39,7 +39,7 @@ USER root
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git python3-all libxcb1
+    apt-get install -y curl git python3-all python3-pip
 
 # Install kubectl
 RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
