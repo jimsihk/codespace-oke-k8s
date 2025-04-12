@@ -1,46 +1,7 @@
-# -----------------------------
-# Build Kdash base image
-# -----------------------------
-
-#FROM oraclelinux:9 AS builder
-
-#RUN dnf -y install git cargo
-
-#WORKDIR /usr/src
-
-# Download and compile Rust dependencies in an empty project and cache as a separate Docker layer
-#RUN USER=root cargo new --bin kdash-temp
-
-#RUN git clone https://github.com/kdash-rs/kdash.git /tmp && ls -l /tmp
-
-#WORKDIR /usr/src/kdash-temp
-#RUN cp /tmp/Cargo.* .
-#RUN cargo build --release
-# remove src from empty project
-#RUN rm -r src
-# Copy actual source files and Build the app binary
-#RUN mv /tmp/kdash/src ./src
-# remove previous deps
-#RUN rm -r ./target/*/release/deps/kdash*
-
-#RUN --mount=type=cache,target=/volume/target \
-#    --mount=type=cache,target=/root/.cargo/registry \
-#    cargo build --release --bin kdash
-#RUN mv target/*/release/kdash .
-
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-#FROM ghcr.io/oracle/oci-cli:latest
-FROM oraclelinux:9
-#FROM almalinux:9
-#FROM debian:stable
+FROM ghcr.io/oracle/oci-cli:latest
 
 USER root
-
-#RUN apt-get update && \
-#    apt-get dist-upgrade -y && \
-    #apt remove python3 && apt autoremove -y && \
-#    apt-get install -y curl git
-
 # Install kubectl
 RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
@@ -50,35 +11,13 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
     # Install git
     dnf -y install git && \
-    # Install oci-cli
-    dnf -y install oraclelinux-developer-release-el9 && \
-    dnf install python39-oci-cli && \
-    #curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
-    #chmod +x install.sh && ./install.sh --accept-all-defaults && \
-    # Following pre-built image, https://github.com/oracle/oci-cli/issues/710
-    #python3 -m pip install --no-cache-dir --upgrade pip && \
-    #python3 -m pip install --no-cache-dir oci-cli && \
     # Clean up
     rm -rf /var/cache/dnf/* && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
-    #dnf -y install libxcb && \
-    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
     # Force to install musl version to avoid GLIBC error
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux\(.*\)\.tar\.gz'/SUFFIX='linux-musl.tar.gz'/" | bash && \
-    # Install docker
-    #dnf -y install dnf-plugins-core && \
-    #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
-    #dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
-    #systemctl enable docker && \
-    # Create user
-    useradd -m -s /bin/bash oracle
-
-#COPY --from=builder /usr/src/kdash-temp/kdash /usr/local/bin
-
-# Debug
-RUN ldd --version && id oracle
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux\(.*\)\.tar\.gz'/SUFFIX='linux-musl.tar.gz'/" | bash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
@@ -93,22 +32,13 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
     . ~/.config/envman/PATH.env && \
-    # Install kdash, with working user
-    #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    #echo 'alias kdash=/oracle/kdash' >> ~/.bashrc && \
-    # Setup kdash with docker
-    #echo 'alias kdash=docker run --network host --rm -it -v ~/.kube/config:/root/.kube/config deepu105/kdash' >> ~/.bashrc && \
     # Verify
     echo "Installed versions:" && \
-    #echo "- oci: $(oci --version)" && \
+    echo "- oci: $(oci --version)" && \
     echo "- kubectl:" && kubectl version --client && \
     echo "- helm: $(helm version)" && \
     echo "- git: $(git --version)" && \
     echo "- k9s:" && k9s version && \
-    #echo "- docker: $(docker version --format '{{.Client.APIVersion}}')" && \
-    echo "- kdash:" && kdash --version
-
-# Debug
-RUN cat ~/.bashrc
+    echo "- kdash: $(kdash --version)"
 
 ENTRYPOINT sleep infinity
