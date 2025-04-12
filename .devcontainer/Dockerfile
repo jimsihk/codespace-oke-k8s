@@ -108,4 +108,7 @@ RUN ln -s /workspaces ~/workspaces && \
     #echo "- docker: $(docker version --format '{{.Client.APIVersion}}')" && \
     echo "- kdash:" && kdash --version
 
+# Debug
+RUN cat ~/.bashrc
+
 ENTRYPOINT sleep infinity
