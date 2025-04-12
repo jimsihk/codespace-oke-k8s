@@ -28,8 +28,10 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          VERSION=${GITHUB_REF#refs/*/}
           IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          VERSION=${GITHUB_REF#refs/*/}
+          if [ ${{ github.event_name = 'pull_request' }} ]; then
+            VERSION=test
           TAGS="${IMAGE_FULL_NAME}:${VERSION}"
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAGS="${TAGS},${{ env.IMAGE_FULL_NAME }}:latest"
