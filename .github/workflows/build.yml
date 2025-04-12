@@ -84,7 +84,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: myimage-${{ steps.prepare.outputs.arch }}.tar
+          name: myimage-${{ steps.prepare.outputs.arch }}
           path: ${{ runner.temp }}/myimage.tar
 
   push:
@@ -97,7 +97,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: myimage-*.tar
+          pattern: myimage-*
           path: ${{ runner.temp }}
 
       - name: Log in to the Container registry
@@ -112,6 +112,7 @@ jobs:
 
       - name: Load images
         run: |
+          ls -l ${{ runner.temp }}
           docker load --input ${{ runner.temp }}/myimage-amd.tar
           docker image ls -a
           docker load --input ${{ runner.temp }}/myimage-arm.tar
