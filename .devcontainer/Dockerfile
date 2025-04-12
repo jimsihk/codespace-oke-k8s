@@ -25,7 +25,7 @@ USER oracle
 WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces && \
-    echo 'echo LOADING bashrc...' >> ~/.bashrc && \
+    echo 'echo ***LOADING bashrc...' >> ~/.bashrc && \
     echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bashrc && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bashrc && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
@@ -42,10 +42,5 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- k9s:" && k9s version && \
     echo "- kdash: $(kdash --version)"
 
-# Debug
-RUN cat ~/.bashrc
-RUN cat ~/.config/envman/PATH.env
-RUN cat ~/.config/envman/load.sh
-
-ENTRYPOINT ["/bin/bash", "-c"]
+ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["sleep", "infinity"]
