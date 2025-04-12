@@ -25,7 +25,7 @@ USER oracle
 WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces && \
-    echo 'export PATH="/opt/okectl:$PATH"' >> ~/.bashrc && \
+    echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bashrc && \
     #echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bashrc && \
     #echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bashrc && \
     #echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
