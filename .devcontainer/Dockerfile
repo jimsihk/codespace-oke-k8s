@@ -44,6 +44,7 @@ RUN ln -s /workspaces ~/workspaces && \
 # Debug
 RUN cat ~/.bashrc
 RUN cat ~/.config/envman/PATH.env
+RUN cat ~/.config/envman/load.sh
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["sleep", "infinity"]
