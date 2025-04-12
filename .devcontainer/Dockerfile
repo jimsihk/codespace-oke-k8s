@@ -41,4 +41,4 @@ RUN ln -s /workspaces ~/workspaces && \
     echo "- k9s:" && k9s version && \
     echo "- kdash: $(kdash --version)"
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "-c"]
