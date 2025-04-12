@@ -30,16 +30,16 @@
 
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 #FROM ghcr.io/oracle/oci-cli:latest
-#FROM oraclelinux:9
+FROM oraclelinux:9
 #FROM almalinux:9
-FROM debian:stable
+#FROM debian:stable
 
 USER root
 
-RUN apt-get update && \
-    apt-get dist-upgrade -y && \
+#RUN apt-get update && \
+#    apt-get dist-upgrade -y && \
     #apt remove python3 && apt autoremove -y && \
-    apt-get install -y curl git
+#    apt-get install -y curl git
 
 # Install kubectl
 RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
@@ -49,23 +49,24 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
     # Install git
-    #dnf -y install git && \
+    dnf -y install git && \
     # Install oci-cli
-    #dnf -y install oraclelinux-developer-release-el9 && \
-    #dnf install python39-oci-cli && \
+    dnf -y install oraclelinux-developer-release-el9 && \
+    dnf install python39-oci-cli && \
     #curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh" && \
     #chmod +x install.sh && ./install.sh --accept-all-defaults && \
     # Following pre-built image, https://github.com/oracle/oci-cli/issues/710
     #python3 -m pip install --no-cache-dir --upgrade pip && \
     #python3 -m pip install --no-cache-dir oci-cli && \
     # Clean up
-    #rm -rf /var/cache/dnf/* && \
+    rm -rf /var/cache/dnf/* && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
     #dnf -y install libxcb && \
     #curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | bash && \
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | bash && \
+    # Force to install musl version to avoid GLIBC error
+    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux\(.*\)\.tar\.gz'/SUFFIX='linux-musl.tar.gz'/" | bash && \
     # Install docker
     #dnf -y install dnf-plugins-core && \
     #dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
