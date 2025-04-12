@@ -32,6 +32,7 @@ RUN ln -s /workspaces ~/workspaces && \
     # Install k9s, with working user as by default it will be installed to ~/.local
     curl -sS https://webi.sh/k9s | sh && \
     . ~/.config/envman/PATH.env && \
+    echo '. ~/.config/envman/PATH.env' >> ~/.bashrc && \
     # Verify
     echo "Installed versions:" && \
     echo "- oci: $(oci --version)" && \
