@@ -66,7 +66,7 @@ jobs:
 
       - name: Test
         run: |
-          RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?") | tail -1"
+          RESULT="$(docker run --rm -v $(pwd)/test.sh:/test.sh ${{ env.IMAGE_NAME }}:test "cat /test.sh | bash; echo \$?")"
           echo "Run result: ${RESULT}"
           if [ "${RESULT}" != '0' ]; then
             exit 1
