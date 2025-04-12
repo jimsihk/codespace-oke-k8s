@@ -35,7 +35,7 @@ jobs:
           fi
           TAGS="${IMAGE_FULL_NAME}:${VERSION}"
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            TAGS="${TAGS},${{ env.IMAGE_FULL_NAME }}:latest"
+            TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
           fi
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
