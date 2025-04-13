@@ -19,6 +19,7 @@ jobs:
   build:
     permissions:
       contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -45,7 +46,7 @@ jobs:
             VERSION=test-${ARCH}
           fi
 
-          TAG="${{ env.IMAGE_NAME }}:${VERSION}"
+          TAG="${IMAGE_FULL_NAME}:${VERSION}"
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           
           TAGS="${IMAGE_FULL_NAME}:${VERSION}"
@@ -77,21 +78,30 @@ jobs:
           push: false
           tags: ${{ steps.prepare.outputs.tag }}
           provenance: false
-          outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
+          load: true
+          #outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
 
       - name: Test
         run: |
-          docker load --input ${{ runner.temp }}/myimage.tar
+          #docker load --input ${{ runner.temp }}/myimage.tar
           docker image history "${{ steps.prepare.outputs.tag }}"
           cd test
           ./run_tests.sh "${{ steps.prepare.outputs.tag }}"
           cd ..
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Push
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
         with:
-          name: myimage-${{ steps.prepare.outputs.arch }}
-          path: ${{ runner.temp }}/myimage.tar
+          context: "{{defaultContext}}:.devcontainer"
+          push: true
+          tags: ${{ steps.prepare.outputs.tag }}
+          provenance: false
+
+      #- name: Upload artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: myimage-${{ steps.prepare.outputs.arch }}
+      #    path: ${{ runner.temp }}/myimage.tar
 
   push:
     needs: [build]
@@ -100,11 +110,11 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          pattern: myimage-*
-          path: ${{ runner.temp }}
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v4
+      #  with:
+      #    pattern: myimage-*
+      #    path: ${{ runner.temp }}
 
       - name: Log in to the Container registry
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
@@ -116,12 +126,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
 
-      - name: Load images
-        run: |
-          docker load --input ${{ runner.temp }}/myimage-amd/myimage.tar
-          docker image ls -a
-          docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
-          docker image ls -a
+      #- name: Load images
+      #  run: |
+      #    docker load --input ${{ runner.temp }}/myimage-amd/myimage.tar
+      #    docker image ls -a
+      #    docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
+      #    docker image ls -a
 
       - name: Merge images
         run: |
@@ -131,8 +141,8 @@ jobs:
           fi
           IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
           docker manifest create $IMAGE_FULL_NAME:$VERSION \
-            ${{ env.IMAGE_NAME }}:$VERSION-amd \
-            ${{ env.IMAGE_NAME }}:$VERSION-arm
+            $IMAGE_FULL_NAME:$VERSION-amd \
+            $IMAGE_FULL_NAME:$VERSION-arm
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
