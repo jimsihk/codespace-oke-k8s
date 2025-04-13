@@ -16,11 +16,15 @@ env:
   IMAGE_PLATFORM: linux/amd64,linux/arm64
 
 jobs:
-  build-container:
+  build:
     permissions:
-      contents: read # for actions/checkout to fetch code
-      packages: write # for docker/build-push-action to store image to package
-    runs-on: ubuntu-latest
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -29,10 +33,22 @@ jobs:
         id: prepare
         run: |
           IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
-          VERSION=${GITHUB_REF#refs/*/}
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            VERSION=test
+
+          if [[ ${{ matrix.os }} == *"-arm" ]]; then
+            ARCH=arm
+          else
+            ARCH=amd
           fi
+          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          
+          VERSION=${GITHUB_REF#refs/*/}-${ARCH}
+          if [ ${{ github.event_name == 'pull_request' }} ]; then
+            VERSION=test-${ARCH}
+          fi
+
+          TAG="${IMAGE_FULL_NAME}:${VERSION}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          
           TAGS="${IMAGE_FULL_NAME}:${VERSION}"
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
@@ -46,11 +62,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: all
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
+      #  with:
+      #    image: tonistiigi/binfmt:latest
+      #    platforms: all
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
@@ -60,23 +76,81 @@ jobs:
         with:
           context: "{{defaultContext}}:.devcontainer"
           push: false
-          tags: ${{ env.IMAGE_NAME }}:test
+          tags: ${{ steps.prepare.outputs.tag }}
           provenance: false
           load: true
+          #outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
 
       - name: Test
         run: |
-          pwd
+          #docker load --input ${{ runner.temp }}/myimage.tar
+          docker image history "${{ steps.prepare.outputs.tag }}"
           cd test
-          ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
+          ./run_tests.sh "${{ steps.prepare.outputs.tag }}"
           cd ..
 
-      - name: Multi-arch build and push
+      - name: Push
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
         with:
           context: "{{defaultContext}}:.devcontainer"
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prepare.outputs.tags }}
-          platforms: ${{ env.IMAGE_PLATFORM }}
+          push: true
+          tags: ${{ steps.prepare.outputs.tag }}
           provenance: false
+
+      #- name: Upload artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: myimage-${{ steps.prepare.outputs.arch }}
+      #    path: ${{ runner.temp }}/myimage.tar
+
+  push:
+    needs: [build]
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v4
+      #  with:
+      #    pattern: myimage-*
+      #    path: ${{ runner.temp }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
+
+      #- name: Load images
+      #  run: |
+      #    docker load --input ${{ runner.temp }}/myimage-amd/myimage.tar
+      #    docker image ls -a
+      #    docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
+      #    docker image ls -a
+
+      - name: Merge images
+        run: |
+          VERSION=${GITHUB_REF#refs/*/}
+          if [ ${{ github.event_name == 'pull_request' }} ]; then
+            VERSION=test
+          fi
+          IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          docker manifest create $IMAGE_FULL_NAME:$VERSION \
+            $IMAGE_FULL_NAME:$VERSION-amd \
+            $IMAGE_FULL_NAME:$VERSION-arm
+          docker manifest push $IMAGE_FULL_NAME:$VERSION
+
+      #- name: Multi-arch build and push
+      #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
+      #  with:
+      #    context: "{{defaultContext}}:.devcontainer"
+      #    push: ${{ github.event_name != 'pull_request' }}
+      #    tags: ${{ steps.prepare.outputs.tags }}
+      #    platforms: ${{ env.IMAGE_PLATFORM }}
+      #    provenance: false
   
