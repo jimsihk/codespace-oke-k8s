@@ -191,7 +191,7 @@ jobs:
             ${{ steps.build-meta.outputs.tags }}-arm
 
       - name: Final Test
-        if: github.event_name = 'pull_request'
+        if: github.event_name == 'pull_request'
         run: |
           docker image history "${{ steps.meta.outputs.tag }}"
           cd test
