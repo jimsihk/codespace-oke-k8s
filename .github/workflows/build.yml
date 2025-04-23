@@ -190,6 +190,10 @@ jobs:
             ${{ steps.build-meta.outputs.tags }}-amd
             ${{ steps.build-meta.outputs.tags }}-arm
 
+      - name: Checkout code
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
       - name: Final Test
         if: github.event_name == 'pull_request'
         run: |
