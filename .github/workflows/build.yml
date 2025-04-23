@@ -184,10 +184,19 @@ jobs:
       - name: Merge images
         uses: int128/docker-manifest-create-action@v2
         with:
+          index-annotations: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
           sources: |
             ${{ steps.build-meta.outputs.tags }}-amd
             ${{ steps.build-meta.outputs.tags }}-arm
+
+      - name: Final Test
+        if: github.event_name = 'pull_request'
+        run: |
+          docker image history "${{ steps.meta.outputs.tag }}"
+          cd test
+          ./run_tests.sh "${{ steps.meta.outputs.tag }}"
+          cd ..
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
