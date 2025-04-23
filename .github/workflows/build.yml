@@ -106,6 +106,8 @@ jobs:
           push: true
           tags: ${{ steps.prepare.outputs.tag }}
           provenance: false
+          labels: ${{ steps.build-meta.outputs.labels }}
+          annotations: ${{ steps.build-meta.outputs.annotations }}
 
       #- name: Upload artifact
       #  uses: actions/upload-artifact@v4
@@ -162,8 +164,8 @@ jobs:
             type=ref,event=tag
             type=ref,event=pr
 
-      - name: Merge images
-        run: |
+      #- name: Merge images
+      #  run: |
           #VERSION=${GITHUB_REF#refs/*/}
           #if [ ${{ github.event_name == 'pull_request' }} ]; then
           #  VERSION=test
@@ -174,10 +176,18 @@ jobs:
           #  $IMAGE_FULL_NAME:$VERSION-arm
           #docker manifest push $IMAGE_FULL_NAME:$VERSION
 
-          docker manifest create ${{ steps.meta.outputs.tags }} \
-            ${{ steps.build-meta.outputs.tags }}-amd \
+          #docker manifest create ${{ steps.meta.outputs.tags }} \
+          #  ${{ steps.build-meta.outputs.tags }}-amd \
+          #  ${{ steps.build-meta.outputs.tags }}-arm
+          #docker manifest push ${{ steps.meta.outputs.tags }}
+
+      - name: Merge images
+        uses: int128/docker-manifest-create-action@v2
+        with:
+          tags: ${{ steps.meta.outputs.tags }}
+          sources: |
+            ${{ steps.build-meta.outputs.tags }}-amd
             ${{ steps.build-meta.outputs.tags }}-arm
-          docker manifest push ${{ steps.meta.outputs.tags }}
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
