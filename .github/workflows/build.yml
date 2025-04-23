@@ -29,31 +29,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: Prepare
+      - name: Prepare Basic Build Meta Data
+        id: build-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+
+      - name: Prepare Multi-Arch Build Meta Data
         id: prepare
         run: |
-          IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          #IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
 
           if [[ ${{ matrix.os }} == *"-arm" ]]; then
             ARCH=arm
           else
             ARCH=amd
           fi
-          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          #echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          echo "tag=${{ steps.build-meta.outputs.tags }}-${ARCH}" >> $GITHUB_OUTPUT
           
-          VERSION=${GITHUB_REF#refs/*/}-${ARCH}
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            VERSION=test-${ARCH}
-          fi
+          #VERSION=${GITHUB_REF#refs/*/}-${ARCH}
+          #if [ ${{ github.event_name == 'pull_request' }} ]; then
+          #  VERSION=test-${ARCH}
+          #fi
 
-          TAG="${IMAGE_FULL_NAME}:${VERSION}"
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          #TAG="${IMAGE_FULL_NAME}:${VERSION}"
+          #echo "tag=${TAG}" >> $GITHUB_OUTPUT
           
-          TAGS="${IMAGE_FULL_NAME}:${VERSION}"
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
-          fi
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          #TAGS="${IMAGE_FULL_NAME}:${VERSION}"
+          #if [[ $GITHUB_REF == refs/tags/* ]]; then
+          #  TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
+          #fi
+          #echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Log in to the Container registry
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
@@ -133,17 +143,41 @@ jobs:
       #    docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
       #    docker image ls -a
 
+      - name: Prepare Basic Build Meta Data
+        id: build-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+
+      - name: Prepare Release Meta Data
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=tag
+            type=ref,event=pr
+
       - name: Merge images
         run: |
-          VERSION=${GITHUB_REF#refs/*/}
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            VERSION=test
-          fi
-          IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
-          docker manifest create $IMAGE_FULL_NAME:$VERSION \
-            $IMAGE_FULL_NAME:$VERSION-amd \
-            $IMAGE_FULL_NAME:$VERSION-arm
-          docker manifest push $IMAGE_FULL_NAME:$VERSION
+          #VERSION=${GITHUB_REF#refs/*/}
+          #if [ ${{ github.event_name == 'pull_request' }} ]; then
+          #  VERSION=test
+          #fi
+          #IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          #docker manifest create $IMAGE_FULL_NAME:$VERSION \
+          #  $IMAGE_FULL_NAME:$VERSION-amd \
+          #  $IMAGE_FULL_NAME:$VERSION-arm
+          #docker manifest push $IMAGE_FULL_NAME:$VERSION
+
+          docker manifest create ${{ steps.meta.outputs.tags }} \
+            ${{ steps.build-meta.outputs.tags }}-amd \
+            ${{ steps.build-meta.outputs.tags }}-arm
+          docker manifest push ${{ steps.meta.outputs.tags }}
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
