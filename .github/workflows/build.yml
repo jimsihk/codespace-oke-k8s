@@ -193,9 +193,9 @@ jobs:
       - name: Final Test
         if: github.event_name == 'pull_request'
         run: |
-          docker image history "${{ steps.meta.outputs.tag }}"
+          docker image history "${{ steps.meta.outputs.tags }}"
           cd test
-          ./run_tests.sh "${{ steps.meta.outputs.tag }}"
+          ./run_tests.sh "${{ steps.meta.outputs.tags }}"
           cd ..
 
       #- name: Multi-arch build and push
