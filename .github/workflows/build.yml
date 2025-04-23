@@ -193,7 +193,7 @@ jobs:
       - name: Final Test
         if: github.event_name == 'pull_request'
         run: |
-          docker image history "${{ steps.meta.outputs.tags }}"
+          docker pull "${{ steps.meta.outputs.tags }}"
           cd test
           ./run_tests.sh "${{ steps.meta.outputs.tags }}"
           cd ..
