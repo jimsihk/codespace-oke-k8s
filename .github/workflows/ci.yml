@@ -1,4 +1,4 @@
-name: Build
+name: ci
 
 on:
   push:
@@ -26,6 +26,10 @@ jobs:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+    
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
@@ -122,6 +126,10 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       #- name: Download artifact
       #  uses: actions/download-artifact@v4
       #  with:
@@ -210,4 +218,22 @@ jobs:
       #    tags: ${{ steps.prepare.outputs.tags }}
       #    platforms: ${{ env.IMAGE_PLATFORM }}
       #    provenance: false
-  
+
+  housekeep:
+    if: github.event_name == 'pull_request'
+    permissions:
+      packages: write
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          delete-only-untagged-versions: 'true'
+          min-versions-to-keep: 4
