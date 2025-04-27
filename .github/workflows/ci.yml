@@ -1,0 +1,295 @@
+name: ci
+
+on:
+  push:
+    tags: ['*']
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - README.md
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_PLATFORM: linux/amd64,linux/arm64
+  PACKAGE_NAME: codespace-oke-k8s
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      version-arm: ${{ steps.gen_output.outputs.version-arm }}
+      version-amd: ${{ steps.gen_output.outputs.version-amd }}
+      tag-arm: ${{ steps.gen_output.outputs.tag-arm }}
+      tag-amd: ${{ steps.gen_output.outputs.tag-amd }}
+      versionid-arm: ${{ steps.gen_output.outputs.versionid-arm }}
+      versionid-amd: ${{ steps.gen_output.outputs.versionid-amd }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+    
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Prepare Basic Build Meta Data
+        id: build-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+
+      - name: Prepare Multi-Arch Build Meta Data
+        id: prepare
+        run: |
+          #IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+
+          if [[ ${{ matrix.os }} == *"-arm" ]]; then
+            ARCH=arm
+          else
+            ARCH=amd
+          fi
+          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          echo "tag=${{ steps.build-meta.outputs.tags }}-${ARCH}" >> $GITHUB_OUTPUT
+          
+          #VERSION=${GITHUB_REF#refs/*/}-${ARCH}
+          #if [ ${{ github.event_name == 'pull_request' }} ]; then
+          #  VERSION=test-${ARCH}
+          #fi
+
+          #TAG="${IMAGE_FULL_NAME}:${VERSION}"
+          #echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          
+          #TAGS="${IMAGE_FULL_NAME}:${VERSION}"
+          #if [[ $GITHUB_REF == refs/tags/* ]]; then
+          #  TAGS="${TAGS},${IMAGE_FULL_NAME}:latest"
+          #fi
+          #echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
+      #  with:
+      #    image: tonistiigi/binfmt:latest
+      #    platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
+
+      - name: Build
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
+        with:
+          context: "{{defaultContext}}:.devcontainer"
+          push: false
+          tags: ${{ steps.prepare.outputs.tag }}
+          provenance: false
+          load: true
+          #outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
+
+      - name: Test
+        run: |
+          #docker load --input ${{ runner.temp }}/myimage.tar
+          docker image history "${{ steps.prepare.outputs.tag }}"
+          cd test
+          ./run_tests.sh "${{ steps.prepare.outputs.tag }}"
+          cd ..
+
+      - name: Push
+        id: push
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
+        with:
+          context: "{{defaultContext}}:.devcontainer"
+          push: true
+          tags: ${{ steps.prepare.outputs.tag }}
+          provenance: false
+          labels: ${{ steps.build-meta.outputs.labels }}
+          annotations: ${{ steps.build-meta.outputs.annotations }}
+
+      - name: Output results for subsequent jobs
+        id: gen_output
+        run: |
+          t_version="${{ steps.build-meta.outputs.version }}-${{ steps.prepare.outputs.arch }}"
+          echo "version-${{ steps.prepare.outputs.arch }}=$t_version" >> $GITHUB_OUTPUT
+          echo "tag-${{ steps.prepare.outputs.arch }}=${{ steps.prepare.outputs.tag }}" >> $GITHUB_OUTPUT
+
+          curl -L \                                                                                                                               
+            -H "Accept: application/vnd.github+json" \                                                                                              
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \                                                                                
+            -H "X-GitHub-Api-Version: 2022-11-28" \                                                                                                 
+            https://api.github.com/users/${{ github.repository_owner }}/packages/container/${{ env.PACKAGE_NAME }}/versions >> containerMeta.json ; 
+          echo "versionid-${{ steps.prepare.outputs.arch }}=$(jq -r '.[] | select(.metadata.container.tags[] == "${t_version}").id' containerMeta.json)" >> "$GITHUB_OUTPUT" ; 
+        
+      #- name: Upload artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: myimage-${{ steps.prepare.outputs.arch }}
+      #    path: ${{ runner.temp }}/myimage.tar
+
+  push:
+    needs: [build]
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tags }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v4
+      #  with:
+      #    pattern: myimage-*
+      #    path: ${{ runner.temp }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
+
+      #- name: Load images
+      #  run: |
+      #    docker load --input ${{ runner.temp }}/myimage-amd/myimage.tar
+      #    docker image ls -a
+      #    docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
+      #    docker image ls -a
+
+      #- name: Prepare Basic Build Meta Data
+      #  id: build-meta
+      #  uses: docker/metadata-action@v5
+      #  with:
+      #    images: |
+      #      ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
+      #    tags: |
+      #      type=sha
+
+      - name: Prepare Release Meta Data
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=ref,event=pr
+
+      #- name: Merge images
+      #  run: |
+          #VERSION=${GITHUB_REF#refs/*/}
+          #if [ ${{ github.event_name == 'pull_request' }} ]; then
+          #  VERSION=test
+          #fi
+          #IMAGE_FULL_NAME="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          #docker manifest create $IMAGE_FULL_NAME:$VERSION \
+          #  $IMAGE_FULL_NAME:$VERSION-amd \
+          #  $IMAGE_FULL_NAME:$VERSION-arm
+          #docker manifest push $IMAGE_FULL_NAME:$VERSION
+
+          #docker manifest create ${{ steps.meta.outputs.tags }} \
+          #  ${{ steps.build-meta.outputs.tags }}-amd \
+          #  ${{ steps.build-meta.outputs.tags }}-arm
+          #docker manifest push ${{ steps.meta.outputs.tags }}
+
+      - name: Merge images
+        uses: int128/docker-manifest-create-action@v2
+        with:
+          index-annotations: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          sources: |
+            ${{ needs.build.outputs.tag-amd }}
+            ${{ needs.build.outputs.tag-arm }}
+
+      - name: Checkout code
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Final Test
+        if: github.event_name == 'pull_request'
+        run: |
+          docker pull "${{ steps.meta.outputs.tags }}"
+          cd test
+          ./run_tests.sh "${{ steps.meta.outputs.tags }}"
+          cd ..
+
+      #- name: Get image ID (AMD)
+      #  id: version-amd
+      #  uses: castlabs/get-package-version-id-action@v2
+      #  with:
+      #    version: ${{ needs.build.outputs.version-amd }}
+
+      - name: Remove temporary image (AMD)
+        #if: ${{ steps.version-amd.outputs.ids != '' }}
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          package-version-ids: "${{ needs.build.outputs.versionid-amd }}"
+
+      #- name: Get image ID (ARM)
+      #  id: version-arm
+      #  uses: castlabs/get-package-version-id-action@v2
+      #  with:
+      #    version: ${{ needs.build.outputs.version-arm }}
+
+      - name: Remove temporary image (ARM)
+        #if: ${{ steps.version-arm.outputs.ids != '' }}
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          package-version-ids: "${{ needs.build.outputs.versionid-arm }}"
+
+      #- name: Multi-arch build and push
+      #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
+      #  with:
+      #    context: "{{defaultContext}}:.devcontainer"
+      #    push: ${{ github.event_name != 'pull_request' }}
+      #    tags: ${{ steps.prepare.outputs.tags }}
+      #    platforms: ${{ env.IMAGE_PLATFORM }}
+      #    provenance: false
+
+  housekeep:
+    if: github.event_name != 'pull_request'
+    permissions:
+      packages: write
+    needs: [build,push]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Housekeep untagged packages
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          delete-only-untagged-versions: 'true'
+          min-versions-to-keep: 4
