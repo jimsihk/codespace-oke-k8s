@@ -20,6 +20,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      imageid-arm: ${{ steps.gen_output.outputs.imageid-arm }}
+      imageid-amd: ${{ steps.gen_output.outputs.imageid-amd }}
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +55,7 @@ jobs:
           else
             ARCH=amd
           fi
-          #echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
           echo "tag=${{ steps.build-meta.outputs.tags }}-${ARCH}" >> $GITHUB_OUTPUT
           
           #VERSION=${GITHUB_REF#refs/*/}-${ARCH}
@@ -104,6 +107,7 @@ jobs:
           cd ..
 
       - name: Push
+        id: push
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
         with:
           context: "{{defaultContext}}:.devcontainer"
@@ -113,6 +117,11 @@ jobs:
           labels: ${{ steps.build-meta.outputs.labels }}
           annotations: ${{ steps.build-meta.outputs.annotations }}
 
+      - name: Output results for subsequent jobs
+        id: gen_output
+        run: |
+          echo "imageid-${{ steps.prepare.outputs.arch }}=${{ steps.push.outputs.imageid }}" >> $GITHUB_OUTPUT
+        
       #- name: Upload artifact
       #  uses: actions/upload-artifact@v4
       #  with:
@@ -209,6 +218,13 @@ jobs:
           cd test
           ./run_tests.sh "${{ steps.meta.outputs.tags }}"
           cd ..
+
+      - uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          package-version-ids: "${{ needs.build.outputs.imageid-arm }}, ${{ needs.build.outputs.imageid-amd }}"
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
