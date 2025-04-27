@@ -21,8 +21,8 @@ jobs:
       contents: read
       packages: write
     outputs:
-      imageid-arm: ${{ steps.gen_output.outputs.imageid-arm }}
-      imageid-amd: ${{ steps.gen_output.outputs.imageid-amd }}
+      tag-arm: ${{ steps.gen_output.outputs.version-arm }}
+      tag-amd: ${{ steps.gen_output.outputs.version-amd }}
     strategy:
       fail-fast: false
       matrix:
@@ -120,7 +120,7 @@ jobs:
       - name: Output results for subsequent jobs
         id: gen_output
         run: |
-          echo "imageid-${{ steps.prepare.outputs.arch }}=${{ steps.push.outputs.imageid }}" >> $GITHUB_OUTPUT
+          echo "version-${{ steps.prepare.outputs.arch }}=${{ steps.build-meta.outputs.version }}-${{ steps.prepare.outputs.arch }}" >> $GITHUB_OUTPUT
         
       #- name: Upload artifact
       #  uses: actions/upload-artifact@v4
@@ -133,6 +133,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tags }}
     runs-on: ubuntu-latest
     steps:
       - uses: step-security/harden-runner@v2
@@ -162,14 +164,14 @@ jobs:
       #    docker load --input ${{ runner.temp }}/myimage-arm/myimage.tar
       #    docker image ls -a
 
-      - name: Prepare Basic Build Meta Data
-        id: build-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha
+      #- name: Prepare Basic Build Meta Data
+      #  id: build-meta
+      #  uses: docker/metadata-action@v5
+      #  with:
+      #    images: |
+      #      ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
+      #    tags: |
+      #      type=sha
 
       - name: Prepare Release Meta Data
         id: meta
@@ -204,8 +206,8 @@ jobs:
           index-annotations: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
           sources: |
-            ${{ steps.build-meta.outputs.tags }}-amd
-            ${{ steps.build-meta.outputs.tags }}-arm
+            ${{ needs.build.outputs.tag-amd }}
+            ${{ needs.build.outputs.tag-arm }}
 
       - name: Checkout code
         if: github.event_name == 'pull_request'
@@ -219,12 +221,35 @@ jobs:
           ./run_tests.sh "${{ steps.meta.outputs.tags }}"
           cd ..
 
-      - uses: actions/delete-package-versions@v5
+      - name: Get image ID (AMD)
+        id: version-amd
+        uses: castlabs/get-package-version-id-action@v2
+        with:
+          version: ${{ needs.build.outputs.tag-amd }}
+
+      - name: Remove temporary image (AMD)
+        if: ${{ steps.version-amd.outputs.ids != '' }}
+        uses: actions/delete-package-versions@v5
         with:
           owner: 'jimsihk'
           package-name: 'codespace-oke-k8s'
           package-type: 'container'
-          package-version-ids: "${{ needs.build.outputs.imageid-arm }}, ${{ needs.build.outputs.imageid-amd }}"
+          package-version-ids: "${{ steps.version-amd.outputs.ids }}"
+
+      - name: Get image ID (ARM)
+        id: version-arm
+        uses: castlabs/get-package-version-id-action@v2
+        with:
+          version: ${{ needs.build.outputs.tag-arm }}
+
+      - name: Remove temporary image (ARM)
+        if: ${{ steps.version-arm.outputs.ids != '' }}
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: 'jimsihk'
+          package-name: 'codespace-oke-k8s'
+          package-type: 'container'
+          package-version-ids: "${{ steps.version-arm.outputs.ids }}"
 
       #- name: Multi-arch build and push
       #  uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
@@ -239,14 +264,15 @@ jobs:
     if: github.event_name != 'pull_request'
     permissions:
       packages: write
-    needs: [push]
+    needs: [build,push]
     runs-on: ubuntu-latest
     steps:
       - uses: step-security/harden-runner@v2
         with:
           egress-policy: audit
 
-      - uses: actions/delete-package-versions@v5
+      - name: Housekeep untagged packages
+        uses: actions/delete-package-versions@v5
         with:
           owner: 'jimsihk'
           package-name: 'codespace-oke-k8s'
