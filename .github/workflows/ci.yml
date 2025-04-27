@@ -21,8 +21,10 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tag-arm: ${{ steps.gen_output.outputs.version-arm }}
-      tag-amd: ${{ steps.gen_output.outputs.version-amd }}
+      version-arm: ${{ steps.gen_output.outputs.version-arm }}
+      version-amd: ${{ steps.gen_output.outputs.version-amd }}
+      tag-arm: ${{ steps.gen_output.outputs.tag-arm }}
+      tag-amd: ${{ steps.gen_output.outputs.tag-amd }}
     strategy:
       fail-fast: false
       matrix:
@@ -121,6 +123,7 @@ jobs:
         id: gen_output
         run: |
           echo "version-${{ steps.prepare.outputs.arch }}=${{ steps.build-meta.outputs.version }}-${{ steps.prepare.outputs.arch }}" >> $GITHUB_OUTPUT
+          echo "tag-${{ steps.prepare.outputs.arch }}=${{ steps.prepare.outputs.tag }}" >> $GITHUB_OUTPUT
         
       #- name: Upload artifact
       #  uses: actions/upload-artifact@v4
@@ -225,7 +228,7 @@ jobs:
         id: version-amd
         uses: castlabs/get-package-version-id-action@v2
         with:
-          version: ${{ needs.build.outputs.tag-amd }}
+          version: ${{ needs.build.outputs.version-amd }}
 
       - name: Remove temporary image (AMD)
         if: ${{ steps.version-amd.outputs.ids != '' }}
@@ -240,7 +243,7 @@ jobs:
         id: version-arm
         uses: castlabs/get-package-version-id-action@v2
         with:
-          version: ${{ needs.build.outputs.tag-arm }}
+          version: ${{ needs.build.outputs.version-arm }}
 
       - name: Remove temporary image (ARM)
         if: ${{ steps.version-arm.outputs.ids != '' }}
