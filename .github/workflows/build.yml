@@ -77,4 +77,15 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           platforms: ${{ env.IMAGE_PLATFORM }}
           provenance: false
-  
+
+      - name: Tag and create a GitHub release
+        #if: github.event_name != 'pull_request'
+        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1
+        with:
+          tag: ${{ steps.meta.outputs.version }}
+          commit: ${{ github.sha }}
+          name: ${{ steps.meta.outputs.version }}
+          skipIfReleaseExists: true
+          allowUpdates: false
+          generateReleaseNotes: true
+          draft: true
