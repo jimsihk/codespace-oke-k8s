@@ -6,6 +6,7 @@ echo "Current user: $(whoami)"
 echo "Current directory: $(pwd)"
 
 echo '****************'
+echo "OS: $(uname -a)"
 echo "Installed versions:"
 echo "- oci: $(oci --version)"
 echo "- kubectl:" && kubectl version --client

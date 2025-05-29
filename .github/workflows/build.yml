@@ -18,7 +18,7 @@ env:
 jobs:
   build-container:
     permissions:
-      contents: read # for actions/checkout to fetch code
+      contents: write # for ncipollo/release-action to create release
       packages: write # for docker/build-push-action to store image to package
     runs-on: ubuntu-latest
     steps:
@@ -73,4 +73,31 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           platforms: ${{ env.IMAGE_PLATFORM }}
           provenance: false
-  
+
+      - name: Tag and create a GitHub release
+        if: github.event_name != 'pull_request'
+        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1
+        with:
+          tag: ${{ steps.meta.outputs.version }}
+          commit: ${{ github.sha }}
+          name: ${{ steps.meta.outputs.version }}
+          skipIfReleaseExists: true
+          allowUpdates: false
+          generateReleaseNotes: true
+          prerelease: ${{ github.event_name == 'pull_request' }}
+
+      - name: Generate tool version details
+        run: |
+          python3 version_parser.py /tmp/test_result.txt > /tmp/vnote.txt
+          cat /tmp/vnote.txt
+
+      - name: Update release with tool version
+        if: github.event_name != 'pull_request'
+        uses: hugoheml/update_release@210697dd5e2b1831b4f4a12eb405dc13cae8fe15
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.meta.outputs.version }}
+        with:
+          is_append_body: true
+          body_path: /tmp/vnote.txt
+          
