@@ -63,11 +63,6 @@ jobs:
           ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
           cd ..
 
-      - name: Generate version details
-        id: vnote
-        run: |
-          python3 version_parser.py > /tmp/vnote.txt
-
       - name: Multi-arch build and push
         uses: docker/build-push-action@1dc73863535b631f98b2378be8619f83b136f4a0 # v6
         with:
@@ -90,6 +85,10 @@ jobs:
           allowUpdates: false
           generateReleaseNotes: true
           prerelease: ${{ github.event_name == 'pull_request' }}
+
+      - name: Generate tool version details
+        run: |
+          python3 version_parser.py > /tmp/vnote.txt
 
       - name: Update release with tool version
         if: github.event_name != 'pull_request'
