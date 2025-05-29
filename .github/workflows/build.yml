@@ -10,9 +10,6 @@ on:
     paths-ignore:
       - README.md
 
-permissions:
-  contents: write
-
 env:
   IMAGE_REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -21,7 +18,7 @@ env:
 jobs:
   build-container:
     permissions:
-      contents: read # for actions/checkout to fetch code
+      contents: write # for ncipollo/release-action to create release
       packages: write # for docker/build-push-action to store image to package
     runs-on: ubuntu-latest
     steps:
