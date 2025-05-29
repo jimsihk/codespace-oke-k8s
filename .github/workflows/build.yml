@@ -91,7 +91,7 @@ jobs:
           skipIfReleaseExists: true
           allowUpdates: false
           generateReleaseNotes: true
-          draft: true
+          #draft: true
 
       - name: Update release with tool version
         uses: hugoheml/update_release@210697dd5e2b1831b4f4a12eb405dc13cae8fe15
