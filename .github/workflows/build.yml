@@ -89,6 +89,7 @@ jobs:
       - name: Generate tool version details
         run: |
           python3 version_parser.py > /tmp/vnote.txt
+          cat /tmp/vnote.txt
 
       - name: Update release with tool version
         if: github.event_name != 'pull_request'
