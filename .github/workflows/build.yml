@@ -84,20 +84,22 @@ jobs:
         uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1
         with:
           #tag: ${{ steps.meta.outputs.version }}
-          tag: 0.0.1
+          tag: 2.0.0
           commit: ${{ github.sha }}
           #name: ${{ steps.meta.outputs.version }}
-          name: 0.0.1
+          name: 2.0.0
           skipIfReleaseExists: true
           allowUpdates: false
           generateReleaseNotes: true
-          #draft: true
+          prerelease: ${{ github.event_name == 'pull_request' }}
 
       - name: Update release with tool version
+        #if: github.event_name != 'pull_request'
         uses: hugoheml/update_release@210697dd5e2b1831b4f4a12eb405dc13cae8fe15
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          TAG_NAME: 0.0.1
+          #TAG_NAME: ${{ steps.meta.outputs.version }}
+          TAG_NAME: 2.0.0
         with:
           is_append_body: true
           body_path: /tmp/vnote.txt
