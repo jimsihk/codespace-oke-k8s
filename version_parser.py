@@ -1,7 +1,16 @@
 import re
+import sys
+
+# Check if a file name is provided as a command-line argument
+if len(sys.argv) != 2:
+    print("Error: Please provide a file name as an argument.")
+    print("Usage: python parse_versions.py <filename>")
+    exit(1)
+
+# Get file path from command-line argument
+file_path = sys.argv[1]
 
 # Read input from file
-file_path = '/tmp/test_result.txt'
 try:
     with open(file_path, 'r') as file:
         text = file.read()
