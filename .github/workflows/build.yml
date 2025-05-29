@@ -88,7 +88,7 @@ jobs:
 
       - name: Generate tool version details
         run: |
-          python3 version_parser.py > /tmp/vnote.txt
+          python3 version_parser.py /tmp/test_result.txt > /tmp/vnote.txt
           cat /tmp/vnote.txt
 
       - name: Update release with tool version
