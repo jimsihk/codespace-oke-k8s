@@ -20,6 +20,7 @@ jobs:
     permissions:
       contents: write # for ncipollo/release-action to create release
       packages: write # for docker/build-push-action to store image to package
+      pull-requests: write # for thollander/actions-comment-pull-request to comment on the PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
