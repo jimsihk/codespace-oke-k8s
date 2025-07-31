@@ -20,6 +20,7 @@ jobs:
     permissions:
       contents: write # for ncipollo/release-action to create release
       packages: write # for docker/build-push-action to store image to package
+      pull-requests: write # for thollander/actions-comment-pull-request to comment on the PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,11 +94,17 @@ jobs:
 
       - name: Update release with tool version
         if: github.event_name != 'pull_request'
-        uses: hugoheml/update_release@210697dd5e2b1831b4f4a12eb405dc13cae8fe15
+        uses: hugoheml/update_release@210697dd5e2b1831b4f4a12eb405dc13cae8fe15 # v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.meta.outputs.version }}
         with:
           is_append_body: true
           body_path: /tmp/vnote.txt
+          
+      - name: Update PR with tool version
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
+        with:
+          file-path: /tmp/vnote.txt
           
