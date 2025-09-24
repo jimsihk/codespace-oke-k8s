@@ -1,5 +1,5 @@
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-FROM ghcr.io/oracle/oci-cli:latest@sha256:85ada28657ee514d02b6968feccbf8637569634c42fed43543af0cb33dc15fe6
+FROM ghcr.io/oracle/oci-cli:latest@sha256:3c8d706cddde8ae7c704827dfb9583ec3d4e2f28d42599320bebd9e1298fa571
 
 USER root
 # Install kubectl
