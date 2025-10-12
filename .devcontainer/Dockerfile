@@ -1,5 +1,7 @@
 # Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-FROM ghcr.io/oracle/oci-cli:latest@sha256:5a6cf0266347e046733be8ced78ebd389f2926d5ca6f8b3f17f471c48504e3b1
+#FROM ghcr.io/oracle/oci-cli:latest@sha256:5a6cf0266347e046733be8ced78ebd389f2926d5ca6f8b3f17f471c48504e3b1
+
+FROM oraclelinux:9-slim
 
 USER root
 # Install kubectl
@@ -11,6 +13,9 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
     # Install git
     dnf -y install git && \
+    # Install oci cli
+    dnf -y install oraclelinux-developer-release-el9 && \
+    dnf install python39-oci-cli && \
     # Clean up
     rm -rf /var/cache/dnf/* && \
     # Install helm
