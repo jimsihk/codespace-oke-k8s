@@ -8,8 +8,6 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
-    # Install helm
-    microdnf --nodocs install helm && \
     # Install git
     microdnf --nodocs -y install git && \
     # Install oci cli
@@ -21,7 +19,7 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     # rm -rf /var/cache/dnf/* && \
     microdnf clean all && \
     # Install helm
-    #curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
     # Force to install musl version to avoid GLIBC error
     curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
