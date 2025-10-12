@@ -16,6 +16,8 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     # Install oci cli
     #dnf -y install oraclelinux-developer-release-el9 && \
     #dnf install python39-oci-cli && \
+    # Create the oracle user which does not exist by default in Oracle Linux 9
+    useradd -m -s /bin/bash oracle && \
     # Clean up
     rm -rf /var/cache/dnf/* && \
     # Install helm
