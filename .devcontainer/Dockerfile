@@ -2,22 +2,22 @@ FROM oraclelinux:9-slim
 
 USER root
 # Install kubectl
-RUN alias dnf="microdnf --nodocs" && \
-    ARCH=$(uname -m) && echo "Detected: $ARCH" && \
+RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
     # Install git
-    dnf -y install git && \
+    microdnf --nodocs -y install git && \
     # Install oci cli
-    dnf -y install oraclelinux-developer-release-el9 && \
-    dnf install python39-oci-cli && \
+    microdnf --nodocs -y install oraclelinux-developer-release-el9 && \
+    microdnf --nodocs install python39-oci-cli && \
     # Create the oracle user which does not exist by default in Oracle Linux 9
     useradd -m -s /bin/bash oracle && \
     # Clean up
-    rm -rf /var/cache/dnf/* && \
+    # rm -rf /var/cache/dnf/* && \
+    microdnf clean && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
