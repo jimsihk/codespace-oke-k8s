@@ -10,6 +10,7 @@ echo "Testing ${TEST_IMAGE}"
 
 echo "=====Inspect image====="
 docker images "${TEST_IMAGE}"
+echo "....."
 
 echo "=====Test installed packages====="
 docker run --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
