@@ -9,7 +9,7 @@ fi
 echo "Testing ${TEST_IMAGE}"
 
 echo "=====Image Size====="
-echo "Uncompressed: $(docker images "${TEST_IMAGE}" --format ".Size")"
+echo "Uncompressed: $(docker images "${TEST_IMAGE}" --format "{{.Size}}")"
 echo "Compressed: $(docker save "${TEST_IMAGE}" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f")"
 echo "....."
 
