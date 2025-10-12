@@ -17,7 +17,7 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     useradd -m -s /bin/bash oracle && \
     # Clean up
     # rm -rf /var/cache/dnf/* && \
-    microdnf clean && \
+    microdnf clean all && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
