@@ -66,6 +66,11 @@ for line in text.splitlines():
                 match = re.search(r'kdash (\S+)', version_info)
                 if match:
                     versions[tool] = match.group(1)
+            elif tool == 'python':
+                # Extract version from "Python X.Y.Z"
+                match = re.search(r'Python (\S+)', version_info)
+                if match:
+                    versions[tool] = match.group(1)
             else:
                 # Direct version
                 versions[tool] = version_info

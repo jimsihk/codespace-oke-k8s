@@ -8,6 +8,12 @@ fi
 
 echo "Testing ${TEST_IMAGE}"
 
+echo "=====Image Size====="
+echo "Uncompressed image size: $(docker images "${TEST_IMAGE}" --format "{{.Size}}")" > /tmp/image_size.txt 2>&1
+echo "Compressed image size: $(docker save "${TEST_IMAGE}" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f")" >> /tmp/image_size.txt 2>&1
+cat /tmp/image_size.txt
+echo "....."
+
 echo "=====Test installed packages====="
 docker run --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; echo \$?" > /tmp/test_result.txt 2>&1
 cat /tmp/test_result.txt

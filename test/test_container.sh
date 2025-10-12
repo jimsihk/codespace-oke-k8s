@@ -14,6 +14,7 @@ echo "- helm: $(helm version)"
 echo "- git: $(git --version)"
 echo "- k9s:" && k9s version
 echo "- kdash: $(kdash --version)"
+echo "- python: $(python3 -V)"
 
 echo '****************'
 echo "Testing oke-tunnel.sh:"
