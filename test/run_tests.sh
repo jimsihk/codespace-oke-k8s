@@ -9,8 +9,10 @@ fi
 echo "Testing ${TEST_IMAGE}"
 
 echo "=====Image Size====="
+echo "Uncompressed:"
 docker images "${TEST_IMAGE}"
-docker save "${TEST_IMAGE}" | gzip -c | wc -c
+echo "Compressed:"
+docker save "${TEST_IMAGE}" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f"
 echo "....."
 
 echo "=====Test installed packages====="
