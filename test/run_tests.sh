@@ -8,8 +8,9 @@ fi
 
 echo "Testing ${TEST_IMAGE}"
 
-echo "=====Inspect image====="
+echo "=====Image Size====="
 docker images "${TEST_IMAGE}"
+docker save "${TEST_IMAGE}" | gzip -c | wc -c
 echo "....."
 
 echo "=====Test installed packages====="
