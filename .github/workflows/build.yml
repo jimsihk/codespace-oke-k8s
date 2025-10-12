@@ -92,6 +92,7 @@ jobs:
           # Tool versions
           python3 version_parser.py /tmp/test_result.txt > /tmp/vnote.txt
           # Image size
+          echo >> /tmp/vnote.txt
           cat /tmp/image_size.txt >> /tmp/vnote.txt
           # Final content
           cat /tmp/vnote.txt
