@@ -9,8 +9,9 @@ fi
 echo "Testing ${TEST_IMAGE}"
 
 echo "=====Image Size====="
-echo "Uncompressed: $(docker images "${TEST_IMAGE}" --format "{{.Size}}")"
-echo "Compressed: $(docker save "${TEST_IMAGE}" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f")"
+echo "Uncompressed: $(docker images "${TEST_IMAGE}" --format "{{.Size}}")" > /tmp/image_size.txt 2>&1
+echo "Compressed: $(docker save "${TEST_IMAGE}" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f")" >> /tmp/image_size.txt 2>&1
+cat /tmp/image_size.txt
 echo "....."
 
 echo "=====Test installed packages====="
