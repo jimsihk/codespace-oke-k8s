@@ -20,12 +20,13 @@
 # oci cannot add --debug as the json parsing at step 1 will have issue
 ################################
 
+TERM=xterm
 clear
 
 ################################
 # Step 0a: Clean up existing connection
 ################################
-kill $(TERM=xterm && pgrep --full bastionsession) > /dev/null 2>&1
+kill $(pgrep --full bastionsession) > /dev/null 2>&1
 
 ################################
 # Step 0b: Housekeep nohup.out
