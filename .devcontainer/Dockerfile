@@ -13,6 +13,8 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     # Install oci cli
     microdnf --nodocs -y install oraclelinux-developer-release-el9 && \
     microdnf --nodocs install python39-oci-cli && \
+    # Install pgrep
+    microdnf --nodocs -y install procps-ng && \
     # Create the oracle user which does not exist by default in Oracle Linux 9
     useradd -m -s /bin/bash oracle && \
     # Clean up
