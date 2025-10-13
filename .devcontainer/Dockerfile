@@ -10,9 +10,9 @@ RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
     install -m 0755 kubectl /usr/local/bin/kubectl && \
     # Install git
-    dnf -y install git && \
+    dnf --nodocs -y install git && \
     # Clean up
-    rm -rf /var/cache/dnf/* && \
+    dnf clean all && \
     # Install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     # Install kdash
