@@ -20,7 +20,6 @@
 # oci cannot add --debug as the json parsing at step 1 will have issue
 ################################
 
-TERM=xterm
 clear
 
 ################################
