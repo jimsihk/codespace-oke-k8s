@@ -1,19 +1,11 @@
-FROM alpine:3.22.2
+FROM alpine:3.22.2 AS builder
 
 USER root
 RUN apk --no-cache add \
-    #kubectl \
-    #helm \
-    git \
-    oci-cli \
-    k9s \
     curl \
     bash \
-    procps-ng \
     openssl coreutils \
-    && rm -rf /var/cache/apk/* \
     # Install kubectl
-    #&& uname -m \
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" \
@@ -23,9 +15,39 @@ RUN apk --no-cache add \
     # Install helm
     && curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
     # Install kdash
-    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
+    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
+
+FROM alpine:3.22.2
+
+USER root
+RUN apk --no-cache add \
+    #kubectl \
+    #helm \
+    git \
+    oci-cli \
+    k9s \
+    #curl \
+    bash \
+    procps-ng \
+    #openssl coreutils \
+    && rm -rf /var/cache/apk/* \
+    # Install kubectl
+    #&& ARCH="$(uname -m)" && echo "Detected: $ARCH" \
+    #&& if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
+    #&& curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" \
+    #&& curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" \
+    #&& echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
+    #&& install -m 0755 kubectl /usr/local/bin/kubectl \
+    # Install helm
+    #&& curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
+    # Install kdash
+    #&& curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
+
+COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
