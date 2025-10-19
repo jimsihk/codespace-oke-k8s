@@ -12,7 +12,7 @@ RUN apk --no-cache add \
     bash \
     && rm -rf /var/cache/apk/* \
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
-    && useradd -m -d /oracle -s /bin/bash oracle
+    && adduser -D -h /oracle -s /bin/bash oracle
 
 # Install kubectl
 #RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
@@ -44,7 +44,7 @@ RUN ln -s /workspaces ~/workspaces && \
     #echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s, with working user as webi will update .bashrc of current user
     #curl -sS https://webi.sh/k9s | sh
-    ls /
+    whoami && pwd && ls -l /
 
 # Launch bash as login shell to always load the .bashrc
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
