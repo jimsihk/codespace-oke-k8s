@@ -36,7 +36,7 @@ RUN apk --no-cache add \
 COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
-COPY --from=builder /usr/local/bin/k9s /usr/local/bin/k9s
+COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
