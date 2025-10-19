@@ -58,7 +58,10 @@ for line in text.splitlines():
                 next_lines = text.splitlines()[text.splitlines().index(line)+1:]
                 for next_line in next_lines:
                     if 'Version:' in next_line:
-                        version = next_line.split('v')[1].strip()
+                        if 'v' in next_line:
+                            version = next_line.split('v')[1].strip()
+                        else:
+                            version = next_line.split(':')[1].strip()
                         versions[tool] = version
                         break
             elif tool == 'kdash':
