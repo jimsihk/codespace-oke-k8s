@@ -20,7 +20,6 @@ echo "- python: $(python3 -V)"
 
 echo '****************'
 echo "Testing oke-tunnel.sh:"
-ls -l /opt/okeutil/
 oke-tunnel.sh && exit_code=0 || exit_code=$?
 echo "$exit_code"
 if [ "$exit_code" -eq 4 ]; then
