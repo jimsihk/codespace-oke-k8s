@@ -10,7 +10,7 @@ RUN apk --no-cache add \
     curl \
     bash \
     procps-ng \
-    openssl \
+    openssl coreutils \
     && rm -rf /var/cache/apk/* \
     # Install kubectl
     #&& uname -m \
