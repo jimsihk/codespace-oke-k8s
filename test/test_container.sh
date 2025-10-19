@@ -20,8 +20,8 @@ echo "- python: $(python3 -V)"
 
 echo '****************'
 echo "Testing alias:"
-which okectl && okectl
-which ohelm && ohelm
+which okectl
+which ohelm
 
 echo '****************'
 echo "Testing oke-tunnel.sh:"
