@@ -1,23 +1,35 @@
-# Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-FROM ghcr.io/oracle/oci-cli:latest@sha256:5a6cf0266347e046733be8ced78ebd389f2926d5ca6f8b3f17f471c48504e3b1
+FROM alpine:3.22.2
 
 USER root
+
+RUN apk --no-cache add \
+    kubectl \
+    helm \
+    git \
+    oci-cli \
+    k9s \
+    curl \
+    bash \
+    && rm -rf /var/cache/apk/* \
+    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
+    && useradd -m -d /oracle -s /bin/bash oracle
+
 # Install kubectl
-RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
-    if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
-    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
-    install -m 0755 kubectl /usr/local/bin/kubectl && \
-    # Install git
-    dnf --nodocs -y install git && \
-    # Clean up
-    dnf clean all && \
-    # Install helm
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
-    # Install kdash
-    # Force to install musl version to avoid GLIBC error
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
+#RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
+#    if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
+#    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
+#    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
+#    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
+#    install -m 0755 kubectl /usr/local/bin/kubectl && \
+#    # Install git
+#    dnf --nodocs -y install git && \
+#    # Clean up
+#    dnf clean all && \
+#    # Install helm
+#    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
+#    # Install kdash
+#    # Force to install musl version to avoid GLIBC error
+#    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
@@ -31,7 +43,8 @@ RUN ln -s /workspaces ~/workspaces && \
     #echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
     #echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s, with working user as webi will update .bashrc of current user
-    curl -sS https://webi.sh/k9s | sh
+    #curl -sS https://webi.sh/k9s | sh
+    ls /
 
 # Launch bash as login shell to always load the .bashrc
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
