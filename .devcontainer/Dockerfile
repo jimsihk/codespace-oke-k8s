@@ -45,8 +45,9 @@ RUN ln -s /workspaces ~/workspaces && \
     #echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
     # Install k9s, with working user as webi will update .bashrc of current user
     #curl -sS https://webi.sh/k9s | sh
-    whoami && pwd && ls -l /
+    pwd && ls -l && echo $HOME \
+    cd && pwd && ls -l
 
 # Launch bash as login shell to always load the .bashrc
-ENTRYPOINT ["bash", "-l", "-c"]
+ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["echo Started at $(date) && sleep infinity"]
