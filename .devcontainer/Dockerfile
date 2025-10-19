@@ -13,7 +13,7 @@ RUN apk --no-cache add \
     procps-ng \
     && rm -rf /var/cache/apk/* \
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
-    && adduser -D -h /oracle -s /bin/bash oracle
+    && adduser -h /oracle -s /bin/bash oracle
 
 # Install kubectl
 #RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
