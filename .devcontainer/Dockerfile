@@ -16,6 +16,8 @@ RUN apk --no-cache add \
     && curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
     # Install kdash
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
+    # Install k9s
+    && curl -sS https://webi.sh/k9s | sh
 
 FROM alpine:3.22.2
 
@@ -34,6 +36,7 @@ RUN apk --no-cache add \
 COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
+COPY --from=builder /usr/local/bin/k9s /usr/local/bin/k9s
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
@@ -45,9 +48,9 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile && \
-    echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile && \
+    echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
     # Install k9s, with working user as webi will update .bashrc of current user
-    curl -sS https://webi.sh/k9s | sh
+    #curl -sS https://webi.sh/k9s | sh
 
 # Launch bash as login shell to always load the .bashrc
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
