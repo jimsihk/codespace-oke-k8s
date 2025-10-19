@@ -61,7 +61,8 @@ for line in text.splitlines():
                         if 'v' in next_line:
                             version = next_line.split('v')[1].strip()
                         else:
-                            version = next_line.split(':')[1].strip()
+                            match = re.search(r'Version:\s*(\d+\.\d+\.\d+)', next_line)
+                            version = match.group(1)
                         versions[tool] = version
                         break
             elif tool == 'kdash':
