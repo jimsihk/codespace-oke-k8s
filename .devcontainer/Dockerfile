@@ -10,6 +10,7 @@ RUN apk --no-cache add \
     k9s \
     curl \
     bash \
+    procps-ng \
     && rm -rf /var/cache/apk/* \
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
     && adduser -D -h /oracle -s /bin/bash oracle
