@@ -61,7 +61,7 @@ for line in text.splitlines():
                         if 'v' in next_line:
                             version = next_line.split('v')[1].strip()
                         else:
-                            match = re.search(r'Version:\s*(\d+\.\d+\.\d+)', next_line)
+                            match = re.search(r'Version:\s*(\S+)', next_line)
                             version = match.group(1)
                         versions[tool] = version
                         break
