@@ -1,8 +1,9 @@
 FROM oraclelinux:9-slim AS builder
 
 USER root
-# Install kubectl
-RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
+RUN microdnf --nodocs -y install openssl && \
+    # Install kubectl
+    ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
