@@ -4,6 +4,7 @@ set -eo pipefail
 
 echo "Current user: $(whoami)"
 echo "Current directory: $(pwd)"
+echo "Shell: $SHELL"
 echo "Path: $PATH"
 
 echo '****************'
