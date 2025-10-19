@@ -19,6 +19,11 @@ echo "- kdash: $(kdash --version)"
 echo "- python: $(python3 -V)"
 
 echo '****************'
+echo "Testing alias:"
+which okectl && okectl
+which ohelm && ohelm
+
+echo '****************'
 echo "Testing oke-tunnel.sh:"
 oke-tunnel.sh && exit_code=0 || exit_code=$?
 echo "$exit_code"
