@@ -65,7 +65,7 @@ for line in text.splitlines():
                             cleaned_output = re.sub(r'[^a-zA-Z0-9.:]', ' ', next_line)  # Replace non-alphanumeric (except . and :) with space
                             cleaned_output = re.sub(r'\s+', ' ', cleaned_output.strip())  # Normalize whitespace to single space
                             # Step 2: Use regex to extract version number
-                            version_match = re.search(r'Version:\s*(\d+\.\d+\.\d+)', cleaned_output)
+                            version_match = re.search(r'Version:\s*(\S+)', cleaned_output)
                             version = version_match.group(1)
                         versions[tool] = version
                         break
