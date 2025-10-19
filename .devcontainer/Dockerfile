@@ -48,5 +48,5 @@ RUN ln -s /workspaces ~/workspaces && \
     whoami && pwd && ls -l /
 
 # Launch bash as login shell to always load the .bashrc
-ENTRYPOINT ["/bin/bash", "-l", "-c"]
+ENTRYPOINT ["bash", "-l", "-c"]
 CMD ["echo Started at $(date) && sleep infinity"]
