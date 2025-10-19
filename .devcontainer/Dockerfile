@@ -1,7 +1,7 @@
 FROM oraclelinux:9-slim AS builder
 
 USER root
-RUN microdnf --nodocs -y install openssl && \
+RUN microdnf --nodocs -y install git && \
     # Install kubectl
     ARCH=$(uname -m) && echo "Detected: $ARCH" && \
     if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
