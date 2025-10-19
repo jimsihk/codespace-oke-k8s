@@ -25,7 +25,6 @@ USER root
 RUN apk --no-cache add \
     git \
     oci-cli \
-    #k9s \
     curl \
     bash \
     procps-ng \
@@ -49,9 +48,7 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile && \
     echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
-    # Install k9s, with working user as webi will update .bashrc of current user
-    #curl -sS https://webi.sh/k9s | sh
 
-# Launch bash as login shell to always load the .bashrc
+# Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["echo Started at $(date) && sleep infinity"]
