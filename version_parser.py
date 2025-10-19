@@ -63,6 +63,7 @@ for line in text.splitlines():
                         else:
                             # Step 1: Clean the input by keeping only alphanumeric characters, periods, and colons
                             cleaned_output = re.sub(r'[^a-zA-Z0-9.:]', '', next_line)  # Remove non-alphanumeric (except . and :)
+                            print(f'cleaned_output=[{cleaned_output}]')
                             # Step 2: Use regex to extract version number
                             version_match = re.search(r'Version:(\S+)', cleaned_output)
                             version = version_match.group(1)
