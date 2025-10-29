@@ -28,7 +28,7 @@ RUN apk --no-cache add \
     curl \
     bash \
     procps-ng \
-    openssh-keygen \
+    openssh-client-default \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
