@@ -29,7 +29,7 @@ fi
 
 echo '****************'
 echo "Testing init-local-oci.sh:"
-init-local-oci.sh < EOF
+init-local-oci.sh<<EOF
 
 dummyuser
 EOF
