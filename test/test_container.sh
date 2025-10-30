@@ -26,3 +26,10 @@ else
   echo "Failed"
   exit "$exit_code"
 fi
+
+echo '****************'
+echo "Testing init-local-oci.sh:"
+init-local-oci.sh < EOF
+
+dummyuser
+EOF
