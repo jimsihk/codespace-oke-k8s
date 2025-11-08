@@ -35,13 +35,17 @@ EOF
 
 init-local-oci.sh<<EOF
 
-
+Y
+ocid1.cluster.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 0.0.0.0
 EOF
 
 echo '~/.oci/config:'
 cat ~/.oci/config
+
+echo '~/.kube/config:'
+cat ~/.kube/config
 
 echo '~/.oci/custom-bastion-config:'
 cat ~/.oci/custom-bastion-config
