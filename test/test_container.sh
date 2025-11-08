@@ -35,7 +35,7 @@ N
 EOF
 
 echo '*' "Testing oci setup:"
-oci iam compartment list --compartment-id ocid1.compartment.oc1..testcompartment
+oci oci iam user get --user-id 'ocid1.user.oc1..testuser'
 
 init-local-oci.sh<<EOF
 
