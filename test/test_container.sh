@@ -2,28 +2,28 @@
 
 set -eo pipefail
 
-echo "Started at $(date)"
+echo '*' "Started at $(date)"
 
-echo "Current user: $(whoami)"
-echo "Current directory: $(pwd)"
+echo '*' "Current user: $(whoami)"
+echo '*' "Current directory: $(pwd)"
 
 echo '****************'
-echo "Testing oke-tunnel.sh:"
+echo '*' "Testing oke-tunnel.sh:"
 oke-tunnel.sh && exit_code=0 || exit_code=$?
-echo "$exit_code"
+echo '*' "$exit_code"
 if [ "$exit_code" -eq 4 ]; then
-  echo "Passed"
+  echo '*' "Passed"
 else
-  echo "Failed"
+  echo '*' "Failed"
   exit "$exit_code"
 fi
 
 echo '****************'
-echo "Testing init-local-oci.sh:"
-echo "Downloading dummy key"
+echo '*' "Testing init-local-oci.sh:"
+echo '*' "Downloading dummy key"
 curl -o dummy_private_key.pem https://raw.githubusercontent.com/cameritelabs/oci-emulator/refs/heads/main/assets/keys/private_key.pem
 export OCI_CLI_ENDPOINT=http://oci-emulator:12000
-echo "Starting init-local-oci.sh:"
+echo '*' "Starting init-local-oci.sh:"
 init-local-oci.sh<<EOF
 
 
@@ -34,8 +34,8 @@ N
 ./dummy_private_key.pem
 EOF
 
-echo "Testing oci setup:"
-oci os ns get
+echo '*' "Testing oci setup:"
+oci iam compartment list --compartment-id ocid1.compartment.oc1..testcompartment
 
 init-local-oci.sh<<EOF
 
@@ -45,13 +45,13 @@ ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 0.0.0.0
 EOF
 
-echo '~/.oci/config:'
+echo '* ~/.oci/config:'
 cat ~/.oci/config
 
-echo '~/.kube/config:'
+echo '* ~/.kube/config:'
 cat ~/.kube/config
 
-echo '~/.oci/custom-bastion-config:'
+echo '* ~/.oci/custom-bastion-config:'
 cat ~/.oci/custom-bastion-config
 
-echo "Completed at $(date)"
+echo '*' "Completed at $(date)"

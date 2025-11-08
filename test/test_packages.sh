@@ -2,10 +2,10 @@
 
 set -eo pipefail
 
-echo "Started at $(date)"
+echo '*' "Started at $(date)"
 
-echo "Current user: $(whoami)"
-echo "Current directory: $(pwd)"
+echo '*' "Current user: $(whoami)"
+echo '*' "Current directory: $(pwd)"
 
 echo '****************'
 echo "OS: $(uname -a)"
@@ -18,4 +18,4 @@ echo "- k9s:" && k9s version
 echo "- kdash: $(kdash --version)"
 echo "- python: $(python3 -V)"
 
-echo "Completed at $(date)"
+echo '*' "Completed at $(date)"
