@@ -25,6 +25,8 @@ init-local-oci.sh<<EOF
 
 ocid1.user.oc1..example456
 ocid1.tenancy.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+eu-zurich-1
 EOF
+cat ~/.oci/config
 
 echo "Completed at $(date)"
