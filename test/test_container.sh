@@ -6,6 +6,13 @@ echo '*' "Started at $(date)"
 
 echo '*' "Current user: $(whoami)"
 echo '*' "Current directory: $(pwd)"
+echo '*' "Shell: $SHELL"
+echo '*' "Path: $PATH"
+
+echo '****************'
+echo '*' "Testing alias:"
+which okectl
+which ohelm
 
 echo '****************'
 echo '*' "Testing oke-tunnel.sh:"
