@@ -35,7 +35,7 @@ N
 EOF
 
 echo '*' "Testing oci setup:"
-oci oci iam user get --user-id 'ocid1.user.oc1..testuser'
+oci iam user get --user-id 'ocid1.user.oc1..testuser'
 
 init-local-oci.sh<<EOF
 
