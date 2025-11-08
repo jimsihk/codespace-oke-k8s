@@ -27,6 +27,7 @@ ocid1.user.oc1..example456
 ocid1.tenancy.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 eu-zurich-1
 
+
 EOF
 
 init-local-oci.sh<<EOF
