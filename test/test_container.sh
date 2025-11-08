@@ -28,6 +28,7 @@ ocid1.tenancy.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 eu-zurich-1
 
 
+
 EOF
 
 init-local-oci.sh<<EOF
