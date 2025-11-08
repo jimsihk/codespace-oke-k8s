@@ -24,7 +24,7 @@ init-local-oci.sh<<EOF
 
 
 ocid1.user.oc1..example456
-dummytenant
+ocid1.tenancy.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 EOF
 
 echo "Completed at $(date)"
