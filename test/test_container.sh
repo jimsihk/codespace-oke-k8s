@@ -23,7 +23,7 @@ echo "Testing init-local-oci.sh:"
 init-local-oci.sh<<EOF
 
 
-dummyuser
+ocid1.user.oc1..example456
 dummytenant
 EOF
 

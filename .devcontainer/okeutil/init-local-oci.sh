@@ -8,6 +8,7 @@ clear
 
 echo "Enter region (e.g. eu-zurich-1), skip to keep unchanged or when init:"
 read -r REGION
+echo "Received: [$REGION]"
 
 if [ -f ~/.oci/config ]
 then
