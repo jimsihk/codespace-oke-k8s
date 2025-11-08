@@ -22,6 +22,7 @@ echo '****************'
 echo "Testing init-local-oci.sh:"
 echo "Downloading dummy key"
 curl -o dummy_private_key.pem https://raw.githubusercontent.com/cameritelabs/oci-emulator/refs/heads/main/assets/keys/private_key.pem
+oci setup repair-file-permissions --file ./dummy_private_key.pem
 echo "Starting init-local-oci.sh:"
 init-local-oci.sh<<EOF
 
