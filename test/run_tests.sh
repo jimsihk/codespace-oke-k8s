@@ -31,7 +31,6 @@ echo "=====Test custom scripts====="
 docker network create data-network
 echo "Start oci-emulator..."
 OCI_CONTAINER_ID=$(docker run --rm -d -p 12000:12000 --name oci-emulator --net=data-network cameritelabs/oci-emulator:latest)
-docker ps
 docker run --net=data-network --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; exit \$?"
 STATUS="$?"
 if [ "${STATUS}" -eq 0 ]; then
