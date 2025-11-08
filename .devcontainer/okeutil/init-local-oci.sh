@@ -8,6 +8,7 @@ clear
 
 echo "Enter region (e.g. eu-zurich-1), skip to keep unchanged or when init:"
 read -r REGION
+echo "Received: [$REGION]"
 
 if [ -f ~/.oci/config ]
 then
@@ -26,6 +27,10 @@ then
   else
     echo '*'" Skipped updating ~/.oci/config "'*'
   fi
+  
+  # ensure key permission is correct
+  OCICLIKEY=$(grep ^key_file ~/.oci/config | cut -d'=' -f2)
+  oci setup repair-file-permissions --file "$OCICLIKEY"
 else
   oci setup config
   echo '*********************'
@@ -51,7 +56,7 @@ then
     echo "Enter cluster OCID:"
     read -r CLUSTER_ID
     
-    REGION=$(grep region= ~/.oci/config | cut -d'=' -f2)
+    REGION=$(grep ^region= ~/.oci/config | cut -d'=' -f2)
     
     echo '*'" Cluster: $CLUSTER_ID "'*'
     echo '*'" REGION: $REGION "'*'
