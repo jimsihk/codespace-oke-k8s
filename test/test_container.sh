@@ -33,34 +33,31 @@ N
 ./dummy_private_key.pem
 EOF
 
-# TODO: test for "oci ce cluster create-kubeconfig" as not supported by oci-emulator yet
-# init-local-oci.sh<<EOF
-#
-# Y
-# ocid1.cluster.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
-# ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
-# 0.0.0.0
-# EOF
-
 init-local-oci.sh<<EOF
 
 N
-ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+ocid1.bastion.oc1..testbastion
 0.0.0.0
 EOF
 
 echo '*' "Testing oci setup:"
 oci iam user get --user-id 'ocid1.user.oc1..testuser'
+exit_code=$?
+echo '*' "$exit_code"
+if [ "$exit_code" -eq 0 ]; then
+  echo '*' "Passed"
+else
+  echo '*' "Failed"
+  exit "$exit_code"
+fi
 
-echo '*' "Listing setup files:"
-
-echo '* ~/.oci/config:'
-cat ~/.oci/config
-
-# echo '* ~/.kube/config:'
-# cat ~/.kube/config
-
-echo '* ~/.oci/custom-bastion-config:'
-cat ~/.oci/custom-bastion-config
+# TODO: test for create-kubeconfig, connect to bastion and k8s (as not supported by oci-emulator yet)
+# init-local-oci.sh<<EOF
+#
+# Y
+# ocid1.cluster.oc1..testcluster
+# ocid1.bastion.oc1..testbastion
+# 0.0.0.0
+# EOF
 
 echo '*' "Completed at $(date)"
