@@ -20,7 +20,7 @@ fi
 
 echo '****************'
 echo '*' "Testing init-local-oci.sh:"
-echo '*' "Downloading dummy key"
+echo '*' "Downloading dummy key:"
 curl -o dummy_private_key.pem https://raw.githubusercontent.com/cameritelabs/oci-emulator/refs/heads/main/assets/keys/private_key.pem
 export OCI_CLI_ENDPOINT=http://oci-emulator:12000
 echo '*' "Starting init-local-oci.sh:"
@@ -34,16 +34,26 @@ N
 ./dummy_private_key.pem
 EOF
 
-echo '*' "Testing oci setup:"
-oci iam user get --user-id 'ocid1.user.oc1..testuser'
+# TODO: test oci ce cluster create-kubeconfig
+# init-local-oci.sh<<EOF
+
+# Y
+# ocid1.cluster.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+# ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+# 0.0.0.0
+# EOF
 
 init-local-oci.sh<<EOF
 
-Y
-ocid1.cluster.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+N
 ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
 0.0.0.0
 EOF
+
+echo '*' "Testing oci setup:"
+oci iam user get --user-id 'ocid1.user.oc1..testuser'
+
+echo '*' "Listing setup files:"
 
 echo '* ~/.oci/config:'
 cat ~/.oci/config
