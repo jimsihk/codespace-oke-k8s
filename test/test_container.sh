@@ -35,8 +35,15 @@ EOF
 
 init-local-oci.sh<<EOF
 
+
+ocid1.bastion.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
+0.0.0.0
 EOF
 
+echo '~/.oci/config:'
 cat ~/.oci/config
+
+echo '~/.oci/custom-bastion-config:'
+cat ~/.oci/custom-bastion-config
 
 echo "Completed at $(date)"
