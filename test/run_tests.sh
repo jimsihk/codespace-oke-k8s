@@ -30,6 +30,7 @@ echo "....."
 echo "=====Test custom scripts====="
 echo "Start oci-emulator..."
 OCI_CONTAINER_ID=$(docker run --rm -d -p 12000:12000 cameritelabs/oci-emulator:latest)
+docker ps
 docker run --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; exit \$?"
 STATUS="$?"
 if [ "${STATUS}" -eq 0 ]; then
