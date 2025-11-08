@@ -35,6 +35,8 @@ N
 ./dummy_private_key.pem
 EOF
 
+oci --debug os ns get
+
 init-local-oci.sh<<EOF
 
 Y
