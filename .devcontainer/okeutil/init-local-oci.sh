@@ -29,7 +29,7 @@ then
   fi
   
   # ensure key permission is correct
-  OCICLIKEY=$(grep ^key_file config | cut -d'=' -f2)
+  OCICLIKEY=$(grep ^key_file ~/.oci/config | cut -d'=' -f2)
   oci setup repair-file-permissions --file "$OCICLIKEY"
 else
   oci setup config
