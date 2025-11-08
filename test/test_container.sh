@@ -29,6 +29,7 @@ eu-zurich-1
 
 
 
+N/A
 EOF
 
 init-local-oci.sh<<EOF
