@@ -20,17 +20,17 @@ fi
 
 echo '****************'
 echo "Testing init-local-oci.sh:"
+echo "Downloading dummy key"
+curl -o dummy_private_key.pem https://raw.githubusercontent.com/cameritelabs/oci-emulator/refs/heads/main/assets/keys/private_key.pem
+echo "Starting init-local-oci.sh:"
 init-local-oci.sh<<EOF
 
 
-ocid1.user.oc1..example456
-ocid1.tenancy.oc1..aaaaaaaabbbbbbbbcccccccddddddddeeeeeeeefffffffggggggg
-eu-zurich-1
-
-
-
-N/A
-N/A
+ocid1.user.oc1..testuser
+ocid1.tenancy.oc1..testtenancy
+sa-saopaulo-1
+N
+./dummy_private_key.pem
 EOF
 
 init-local-oci.sh<<EOF

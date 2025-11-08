@@ -28,14 +28,19 @@ unset STATUS
 echo "....."
 
 echo "=====Test custom scripts====="
+echo "Start oci-emulator..."
+OCI_CONTAINER_ID=$(docker run --rm -d -p 12000:12000 cameritelabs/oci-emulator:latest)
 docker run --rm -v $(pwd)/test_container.sh:/mnt/test.sh "${TEST_IMAGE}" "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; exit \$?"
-if [ "$?" -eq 0 ]; then
+STATUS="$?"
+if [ "${STATUS}" -eq 0 ]; then
   echo "Passed"
 else
   echo "Failed"
   exit "${STATUS}"
 fi
 unset STATUS
+echo "Clean oci-emulator"
+docker kill "${OCI_CONTAINER_ID}"
 echo "....."
 
 echo "=====Test entrypoint====="
