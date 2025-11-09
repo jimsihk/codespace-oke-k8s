@@ -48,7 +48,9 @@ RUN ln -s /workspaces ~/workspaces && \
     echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile && \
     echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile && \
     echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile && \
-    echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
+    echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile && \
+    # Attempt to load oci setup config when re-login
+    echo '/bin/bash /opt/okeutil/load-oke-config.sh' >> ~/.bash_profile
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
