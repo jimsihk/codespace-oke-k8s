@@ -28,7 +28,7 @@ RUN apk --no-cache add \
 COPY hack /usr/local/lib/hack/
 RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py \
     # Manually patch the script to use uv for faster installation
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     && chmod +x /usr/local/lib/hack/* \
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "$VIRTUAL_ENV"
