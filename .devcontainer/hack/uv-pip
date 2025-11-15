@@ -1,0 +1,9 @@
+#!/bin/bash
+
+WKDIR=`pwd`
+cd "$VIRTUAL_ENV"
+V_VENV=`basename "$VIRTUAL_ENV"`
+cd ..
+uv venv "$V_VENV"
+cd "$WKDIR"
+uv pip "$@"

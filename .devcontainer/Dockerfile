@@ -25,15 +25,13 @@ RUN apk --no-cache add \
     #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
     && echo "Running custom installation of oci-cli"
 
-COPY uv-pip /usr/local/bin/uv-pip
+COPY hack /usr/local/lib/hack/
 RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py \
     # Manually patch the script to use uv for faster installation
-    && sed -i 's/upgrade_pip_wheel/#upgrade_pip_wheel/g' install.py \
-    && sed -i 's/def #upgrade_pip_wheel/def upgrade_pip_wheel/g' install.py \
-    && sed -i "s|path_to_pip = os.path.join(install_dir, 'bin', 'pip')|path_to_pip = os.path.join('/usr/local', 'bin', 'uv-pip')|g" install.py \
-    # Create the tempoary hack uv-pip file
-    && chmod +x /usr/local/bin/uv-pip \
-    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli
+    && chmod +x /usr/local/lib/hack/* \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "$VIRTUAL_ENV"
 
 FROM alpine:3.22.2
 
