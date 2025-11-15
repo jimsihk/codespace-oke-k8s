@@ -24,12 +24,16 @@ FROM alpine:3.22.2
 USER root
 RUN apk --no-cache add \
     git \
-    oci-cli \
+    #oci-cli \
     curl \
     bash \
     procps-ng \
     openssh-client-default \
+    sh \
     && rm -rf /var/cache/apk/* \
+    # Install oci-cli
+    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
+    && ./install.sh --accept-all-defaults \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
 
