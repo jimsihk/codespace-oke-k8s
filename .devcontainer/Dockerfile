@@ -31,8 +31,9 @@ RUN apk --no-cache add \
     openssh-client-default \
     && rm -rf /var/cache/apk/* \
     # Install oci-cli
-    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && chmod +x install.sh && ./install.sh --accept-all-defaults \
+    #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
+    #&& chmod +x install.sh && ./install.sh --accept-all-defaults \
+    && bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
 
