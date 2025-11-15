@@ -20,8 +20,27 @@ RUN apk --no-cache add \
     # Install k9s
     && curl -sS https://webi.sh/k9s | sh \
     # Install oci-cli
-    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
+    #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
+    #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
+    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py \
+    # Manually patch the script to use uv for faster installation
+    && sed -i 's/upgrade_pip_wheel/#upgrade_pip_wheel/g' install.py \
+    && sed -i 's/def #upgrade_pip_wheel/def upgrade_pip_wheel/g' install.py \
+    && sed -i "s|path_to_pip = os.path.join(install_dir, 'bin', 'pip')|path_to_pip = os.path.join('/usr/local', 'bin', 'uv-pip')|g" install.py \
+    # Create the tempoary hack uv-pip file
+    # && echo 'uv pip "$@"' > /usr/local/bin/uv-pip \
+    && cat > /usr/loca/bin/uv-pip << 'EOF'
+#!/usr/bin/env bash
+WKDIR=`pwd`
+export VIRTUAL_ENV=/usr/local/lib/oracle-cli
+cd $VIRTUAL_ENV
+cd ..
+uv venv oracle-cli
+cd $WKDIR
+uv pip "$@"
+EOF
+    && chmod +x /usr/local/bin/uv-pip \
+    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
 
 FROM alpine:3.22.2
 
