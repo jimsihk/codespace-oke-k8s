@@ -21,7 +21,7 @@ RUN apk --no-cache add \
     && curl -sS https://webi.sh/k9s | sh \
     # Install oci-cli
     && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && bash install.sh --accept-all-defaults
+    && bash install.sh --accept-all-defaults --exec-dir /usr/local/bin/
 
 FROM alpine:3.22.2
 
@@ -42,7 +42,7 @@ COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
-COPY --from=builder /root/bin/oci /usr/local/bin/oci
+COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
 
 COPY --chown=oracle okeutil /opt/okeutil/
 
