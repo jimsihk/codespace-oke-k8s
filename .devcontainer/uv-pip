@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 WKDIR=`pwd`
 export VIRTUAL_ENV=/usr/local/lib/oracle-cli
