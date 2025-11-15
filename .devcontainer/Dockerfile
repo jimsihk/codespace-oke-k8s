@@ -29,12 +29,11 @@ RUN apk --no-cache add \
     bash \
     procps-ng \
     openssh-client-default \
-    mktemp \
+    python3 \
     && rm -rf /var/cache/apk/* \
     # Install oci-cli
-    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && chmod +x install.sh && ./install.sh --accept-all-defaults \
-    #&& bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" --accept-all-defaults \
+    && curl -L https://github.com/oracle/oci-cli/archive/refs/tags/v3.70.1.tar.gz | tar xz --strip-components=1 \
+    && bash install.sh --offline-install \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
 
