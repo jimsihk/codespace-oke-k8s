@@ -37,7 +37,7 @@ RUN apk --no-cache add \
     #&& curl -LO https://github.com/oracle/oci-cli/releases/download/v3.70.1/oci-cli-3.70.1.zip \
     #&& unzip oci-cli-3.70.1.zip \
     && echo "=== Current path: `pwd` ===" && ls -l \
-    && bash scripts/install/install.sh --offline-install \
+    && bash oci-cli-3.70.1/scripts/install/install.sh --offline-install \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
 
