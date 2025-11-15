@@ -29,7 +29,6 @@ RUN apk --no-cache add \
     bash \
     procps-ng \
     openssh-client-default \
-    sh \
     && rm -rf /var/cache/apk/* \
     # Install oci-cli
     && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
