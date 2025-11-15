@@ -32,7 +32,7 @@ RUN apk --no-cache add \
     && rm -rf /var/cache/apk/* \
     # Install oci-cli
     && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && ./install.sh --accept-all-defaults \
+    && chmod +x install.sh && ./install.sh --accept-all-defaults \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle
 
