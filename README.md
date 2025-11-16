@@ -38,9 +38,9 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
     }
     ```
 #### Setup local environment for OKE
-2. In the codespace, execute `init-oci-local.sh` to setup OCI configuration and create API key
+2. In the codespace, execute `init-local-oci.sh` to setup OCI configuration and create API key
 3. Copy the generated public key value and add as a key under the OCI user on OCI portal
-4. In the codespace, execute `init-oci-local.sh` again to further setup
+4. In the codespace, execute `init-local-oci.sh` again to further setup
     - Setup kubeconfig
     - Setup bastion session configuration with SSH key generation
 5. In the codespace, execute `check-oke-connection.sh && echo $?` for verification
@@ -109,7 +109,7 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
 ## Add-on Commands 
 Actual scripts are located under `/opt/okeutil/`:
 
-`init-oci-local.sh`
+`init-local-oci.sh`
 - initialize for the oci command, kubectl command and tunnel connection to OKE
 
 `oke-tunnel.sh`
