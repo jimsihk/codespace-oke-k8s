@@ -62,6 +62,18 @@ jobs:
           provenance: false
           load: true
 
+      - name: Get latest oci-emulator commit
+        id: oci-emulator-commit
+        uses: nmbgeek/github-action-get-latest-commit@f2f8a3ff40ee485eaded28ba469b5a5d98f7cf89 # v0.1.0
+        with:
+          owner: cameritelabs
+          repo: oci-emulator
+
+      - name: Get docker cache of oci-emulator
+        uses: ScribeMD/docker-cache@fb28c93772363301b8d0a6072ce850224b73f74e # v0.5.0
+        with:
+          key: docker-${{ runner.os }}-${{ steps.oci-emulator-commit.outputs.hash }}
+
       - name: Test
         run: |
           pwd
