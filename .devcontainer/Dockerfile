@@ -1,4 +1,4 @@
-FROM alpine:3.22.2 AS builder
+FROM alpine:3.23.0 AS builder
 
 USER root
 RUN apk --no-cache add \
@@ -33,7 +33,7 @@ RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/i
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "$VIRTUAL_ENV"
 
-FROM alpine:3.22.2
+FROM alpine:3.23.0
 
 USER root
 RUN apk --no-cache add \
