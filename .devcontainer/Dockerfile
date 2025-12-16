@@ -57,7 +57,7 @@ RUN apk --no-cache add \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user which does not exist
     && adduser -D -h /oracle -s /bin/bash oracle \
-    && chmod -R 755 /opt/okectl/
+    && chmod -R 755 /opt/okeutil/
 
 USER oracle
 WORKDIR /oracle
