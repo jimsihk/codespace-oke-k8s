@@ -36,6 +36,16 @@ RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/i
 FROM alpine:3.23.0
 
 USER root
+
+COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
+COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
+COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
+COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
+
+COPY okeutil /opt/okeutil/
+
 RUN apk --no-cache add \
     git \
     #oci-cli \
@@ -46,16 +56,8 @@ RUN apk --no-cache add \
     python3 \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user which does not exist
-    && adduser -D -h /oracle -s /bin/bash oracle
-
-COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
-COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
-COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
-COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
-COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
-COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
-
-COPY --chown=oracle okeutil /opt/okeutil/
+    && adduser -D -h /oracle -s /bin/bash oracle \
+    && chmod -R 755 /opt/okectl/
 
 USER oracle
 WORKDIR /oracle
