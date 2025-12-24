@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Run uv pip instead of pip"
+
 WKDIR=`pwd`
 cd "$VIRTUAL_ENV"
 V_VENV=`basename "$VIRTUAL_ENV"`
