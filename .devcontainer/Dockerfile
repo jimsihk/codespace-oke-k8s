@@ -30,7 +30,7 @@ RUN apk --no-cache add \
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
     # Install oci-cli
     && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli --oci-cli-version "${OCI_CLI_VERSION}"
+    && bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli --oci-cli-version "$(echo ${OCI_CLI_VERSION} | sed 's/v//g')"
     #&& echo "Running custom installation of oci-cli and kdash"
 
 COPY hack /usr/local/lib/hack/
