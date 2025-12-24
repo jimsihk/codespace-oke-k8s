@@ -47,7 +47,8 @@ RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/i
 # Install kdash
 RUN curl -L -O https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh \
     # Manually patch the installation script to support musl and specify version
-    && /usr/local/lib/hack/patch-kdash-getLatest-sh.sh getLatest.sh "${KDASH_VERSION}"
+    && /usr/local/lib/hack/patch-kdash-getLatest-sh.sh getLatest.sh "${KDASH_VERSION}" \
+    && bash getLatest.sh
 
 FROM alpine:3.23.0
 
