@@ -21,7 +21,7 @@ RUN apk --no-cache add \
     # Install kdash
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
     # Install k9s
-    && curl -sS https://webi.sh/k9s | sh \
+    && curl -sS https://webi.sh/k9s@v0.50.16 | sh \
     # Install oci-cli
     #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
     #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
