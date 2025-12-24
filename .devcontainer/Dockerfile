@@ -42,7 +42,7 @@ RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/i
     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     #&& chmod +x /usr/local/lib/hack/* \
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "$VIRTUAL_ENV"
+    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCICLI_VERSION}"
 
 # Install kdash
 RUN curl -L -O https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh \
