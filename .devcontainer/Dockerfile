@@ -4,7 +4,7 @@ ENV KUBECTL_VERSION=v1.35.0
 ENV HELM_VERSION=v3.19.4
 ENV KDASH_VERSION=v0.6.2
 ENV K9S_VERSION=v0.50.16
-ENV OCI_CLI_VERSION=v3.17.4
+ENV OCI_CLI_VERSION=v3.71.4
 
 USER root
 RUN apk --no-cache add \
@@ -37,7 +37,7 @@ COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
-RUN curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/refs/tags/${OCI_CLI_VERSION}/scripts/install/install.py" \
+RUN curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     #curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
