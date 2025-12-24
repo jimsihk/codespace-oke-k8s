@@ -37,7 +37,7 @@ COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
-RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py \
+RUN curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     #&& chmod +x /usr/local/lib/hack/* \
