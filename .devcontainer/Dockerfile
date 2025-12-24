@@ -16,7 +16,7 @@ RUN apk --no-cache add \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
     #&& curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
-    && curl -L -O curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
+    && curl -L -O https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
     && bash get-helm-3 --version 3.19.4 \
     # Install kdash
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
