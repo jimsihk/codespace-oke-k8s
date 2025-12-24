@@ -2,7 +2,7 @@ FROM alpine:3.23.0 AS builder
 
 ENV KUBECTL_VERSION=v1.35.0
 ENV HELM_VERSION=3.19.4
-ENV KDASH_VERSION=0.6.2
+ENV KDASH_VERSION=v0.6.2
 ENV K9S_VERSION=v0.50.16
 ENV OCICLI_VERSION=3.17.4
 
@@ -25,7 +25,7 @@ RUN apk --no-cache add \
     && curl -L -O https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
     && bash get-helm-3 --version "${HELM_VERSION}" \
     # Install kdash
-    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
+    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | sed "s|/releases/latest|/releases/tags/${KDASH_VERSION}|g" | bash \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
     # Install oci-cli
