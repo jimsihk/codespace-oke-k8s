@@ -4,14 +4,14 @@ ENV KUBECTL_VERSION=v1.35.0
 ENV HELM_VERSION=v3.19.4
 ENV KDASH_VERSION=v0.6.2
 ENV K9S_VERSION=v0.50.16
-ENV OCI_CLI_VERSION=v3.71.2
+ENV OCI_CLI_VERSION=v3.71.4
 
 USER root
 RUN apk --no-cache add \
     curl \
     bash \
     openssl coreutils \
-    python3 py3-pip \
+    #python3 py3-pip \
     python3 uv \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
@@ -29,21 +29,21 @@ RUN apk --no-cache add \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
     # Install oci-cli
-    && curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
-    && bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli --oci-cli-version "$(echo ${OCI_CLI_VERSION} | sed 's/v//g')"
-    #&& echo "Running custom installation of oci-cli and kdash"
+    #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
+    #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli --oci-cli-version "$(echo ${OCI_CLI_VERSION} | sed 's/v//g')"
+    && echo "Running custom installation of oci-cli and kdash"
 
 COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-#RUN curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+RUN curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     #curl -L -O "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
-    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    #&& /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    #&& python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Install kdash
 RUN curl -L -O https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh \
