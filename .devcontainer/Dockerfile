@@ -27,11 +27,11 @@ RUN apk --no-cache add \
     # Install kdash
     #&& curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | sed "s|/releases/latest|/releases/tags/${KDASH_VERSION}|g" | bash \
     # Install k9s
-    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh #\
+    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
     # Install oci-cli
     #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
     #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
-    #&& echo "Running custom installation of oci-cli"
+    && echo "Running custom installation of oci-cli and kdash"
 
 COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
