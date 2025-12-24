@@ -25,21 +25,29 @@ RUN apk --no-cache add \
     && curl -L -O https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
     && bash get-helm-3 --version "${HELM_VERSION}" \
     # Install kdash
-    && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | sed "s|/releases/latest|/releases/tags/${KDASH_VERSION}|g" | bash \
+    #&& curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | sed "s|/releases/latest|/releases/tags/${KDASH_VERSION}|g" | bash \
     # Install k9s
-    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
+    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh #\
     # Install oci-cli
     #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
     #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
-    && echo "Running custom installation of oci-cli"
+    #&& echo "Running custom installation of oci-cli"
 
 COPY hack /usr/local/lib/hack/
+RUN chmod +x /usr/local/lib/hack/*
+
+# Install oci-cli
 RUN curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.py \
-    # Manually patch the script to use uv for faster installation
+    # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    && chmod +x /usr/local/lib/hack/* \
+    #&& chmod +x /usr/local/lib/hack/* \
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "$VIRTUAL_ENV"
+
+# Install kdash
+RUN curl -L -O https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh \
+    # Manually patch the installation script to support musl and specify version
+    && /usr/local/lib/hack/patch-kdash-getLatest-sh.sh getLatest.sh "${KDASH_VERSION}"
 
 FROM alpine:3.23.0
 
