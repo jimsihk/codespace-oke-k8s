@@ -11,7 +11,7 @@ RUN apk --no-cache add \
     curl \
     bash \
     openssl coreutils \
-    # python3 py3-pip \
+    python3 py3-pip \
     python3 uv \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
