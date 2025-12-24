@@ -1,5 +1,11 @@
 FROM alpine:3.23.0 AS builder
 
+ENV KUBECTL_VERSION=v1.35.0
+ENV HELM_VERSION=3.19.4
+ENV KDASH_VERSION=0.6.2
+ENV K9S_VERSION=v0.50.16
+ENV OCICLI_VERSION=3.17.4
+
 USER root
 RUN apk --no-cache add \
     curl \
@@ -10,18 +16,18 @@ RUN apk --no-cache add \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
-    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" \
-    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" \
+    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl.sha256" \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
     #&& curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
     && curl -L -O https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
-    && bash get-helm-3 --version 3.19.4 \
+    && bash get-helm-3 --version "${HELM_VERSION}" \
     # Install kdash
     && curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash \
     # Install k9s
-    && curl -sS https://webi.sh/k9s@v0.50.16 | sh \
+    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh \
     # Install oci-cli
     #&& curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh \
     #&& bash install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /usr/local/lib/oracle-cli
