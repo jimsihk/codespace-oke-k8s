@@ -15,6 +15,10 @@ which okectl
 which ohelm
 
 echo '****************'
+echo '*' "Testing oci autocomplete:"
+oci $' \t\t'
+
+echo '****************'
 echo '*' "Testing oke-tunnel.sh:"
 oke-tunnel.sh && exit_code=0 || exit_code=$?
 echo '*' "$exit_code"
