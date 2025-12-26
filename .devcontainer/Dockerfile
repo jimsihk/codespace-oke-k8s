@@ -1,11 +1,11 @@
+FROM alpine:3.23.0 AS builder
+
 ARG KUBECTL_VERSION=v1.35.0
 ARG HELM_VERSION=v3.19.4
 ARG KDASH_VERSION=v0.6.2
 ARG K9S_VERSION=v0.50.16
 ARG OCI_CLI_VERSION=v3.71.4
-ARG PYTHON_VERSION="=3.12.12-r0"
-
-FROM alpine:3.23.0 AS builder
+ARG PYTHON_VERSION=3.12.12-r0
 
 USER root
 RUN apk --no-cache add \
@@ -14,7 +14,7 @@ RUN apk --no-cache add \
     openssl \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils \
-    python3${PYTHON_VERSION} \
+    python3=${PYTHON_VERSION} \
     # Install uv to replace pip for better performance on oci-cli installation
     uv \
     # Install kubectl
