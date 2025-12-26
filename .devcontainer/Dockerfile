@@ -14,7 +14,7 @@ RUN apk --no-cache add \
     openssl \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils \
-    python3${PYTHON_VERSION} \
+    python3 \
     # Install uv to replace pip for better performance on oci-cli installation
     uv \
     # Install kubectl
