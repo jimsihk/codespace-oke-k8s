@@ -56,6 +56,7 @@ COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
 COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
 COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
+COPY --from=builder /usr/local/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
 
 COPY okeutil /opt/okeutil/
 
@@ -71,17 +72,20 @@ RUN apk --no-cache add \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
-    && chmod -R 755 /opt/okeutil/
+    # Set permission for utility scripts
+    && chmod -R 755 /opt/okeutil/ \
+    && chmod +x /usr/local/bin/oci_autocomplete.sh
 
 USER oracle
 WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
-RUN ln -s /workspaces ~/workspaces && \
-    echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile && \
-    echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile && \
-    echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile && \
-    echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile && \
-    echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
+RUN ln -s /workspaces ~/workspaces \
+    && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile \
+    && echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile \
+    && echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile \
+    && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
+    && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
+    && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> /oracle/.bashrc
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
