@@ -16,7 +16,7 @@ which ohelm
 
 echo '****************'
 echo '*' "Testing oci autocomplete:"
-oci $' \t\t'
+complete -p oci
 
 echo '****************'
 echo '*' "Testing oke-tunnel.sh:"
