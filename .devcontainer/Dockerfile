@@ -14,14 +14,14 @@ RUN apk --no-cache add \
     openssl \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils \
-    python3 \
+    python3${PYTHON_VERSION} \
     # Install uv to replace pip for better performance on oci-cli installation
     uv \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
-    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
-    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl.sha256" \
+    && curl -vLO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+    && curl -vLO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl.sha256" \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
