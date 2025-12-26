@@ -71,7 +71,7 @@ RUN apk --no-cache add \
     procps-ng \
     # Install ssh and ssh-keygen for OCI bastion tunneling
     openssh-client-default \
-    python3${PYTHON_VERSION} \
+    python3=${PYTHON_VERSION} \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
