@@ -41,8 +41,6 @@ RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
-RUN cat /root/.bashrc && ls -l /root/bin/oci-cli-script/
-
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
     # Manually patch the installation script to support musl and specify version
@@ -61,8 +59,7 @@ COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
 COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
 COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
-COPY --from=builder /root/bin/oci-cli-scripts /usr/local/bin/oci-cli-scripts
-COPY --from=builder /root/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
+COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
 
 COPY okeutil /opt/okeutil/
 
@@ -91,7 +88,7 @@ RUN ln -s /workspaces ~/workspaces \
     && echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile \
     && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
     && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
-    && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> /oracle/.bashrc
+    && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
