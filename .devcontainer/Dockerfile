@@ -68,8 +68,8 @@ COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
 COPY okeutil /opt/okeutil/
 
 # For install oci-cli
-COPY hack /usr/local/lib/hack/
-RUN chmod +x /usr/local/lib/hack/*
+# COPY hack /usr/local/lib/hack/
+# RUN chmod +x /usr/local/lib/hack/*
 
 RUN apk --no-cache add \
     git \
@@ -81,7 +81,8 @@ RUN apk --no-cache add \
     openssh-client-default \
     python3=${PYTHON_VERSION} \
     # For install oci-cli
-    uv \
+    # uv \
+    py3-pip \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
@@ -105,7 +106,7 @@ ARG OCI_CLI_VERSION=v3.71.4
 RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/oracle/lib/oracle-cli \
-    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /oracle/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
