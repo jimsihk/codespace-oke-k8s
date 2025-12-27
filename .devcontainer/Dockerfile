@@ -16,7 +16,7 @@ RUN apk --no-cache add \
     coreutils \
     python3=${PYTHON_VERSION} \
     # Install uv to replace pip for better performance on oci-cli installation
-    # uv \
+    uv \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
@@ -47,6 +47,10 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
     && /usr/local/lib/hack/patch-kdash-getLatest-sh.sh getLatest.sh "${KDASH_VERSION}" \
     && bash getLatest.sh
 
+##########################################
+# Build final container
+##########################################
+
 FROM alpine:3.23.0
 
 ARG PYTHON_VERSION=3.12.12-r0
@@ -63,6 +67,10 @@ COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
 
 COPY okeutil /opt/okeutil/
 
+# For install oci-cli
+COPY hack /usr/local/lib/hack/
+RUN chmod +x /usr/local/lib/hack/*
+
 RUN apk --no-cache add \
     git \
     curl \
@@ -72,7 +80,7 @@ RUN apk --no-cache add \
     # Install ssh and ssh-keygen for OCI bastion tunneling
     openssh-client-default \
     python3=${PYTHON_VERSION} \
-    # Install uv to replace pip for better performance on oci-cli installation
+    # For install oci-cli
     uv \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
@@ -94,8 +102,6 @@ RUN ln -s /workspaces ~/workspaces \
 
 # Install oci-cli
 ARG OCI_CLI_VERSION=v3.71.4
-COPY hack /oracle/hack/
-RUN chmod +x /oracle/hack/*
 RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/oracle/oracle-cli \
