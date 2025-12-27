@@ -94,7 +94,7 @@ RUN ln -s /workspaces ~/workspaces \
     # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
 
 COPY --from=builder /install.py /oracle/install.py
-RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+RUN export VIRTUAL_ENV=/oracle/oracle-cli \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
