@@ -104,9 +104,9 @@ RUN ln -s /workspaces ~/workspaces \
 ARG OCI_CLI_VERSION=v3.71.4
 RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
-    && export VIRTUAL_ENV=/oracle/oracle-cli \
+    && export VIRTUAL_ENV=/oracle/lib/oracle-cli \
     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    && python install.py --accept-all-defaults --exec-dir /oracle/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
