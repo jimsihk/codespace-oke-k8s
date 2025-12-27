@@ -4,7 +4,7 @@ ARG KUBECTL_VERSION=v1.35.0
 ARG HELM_VERSION=v3.19.4
 ARG KDASH_VERSION=v0.6.2
 ARG K9S_VERSION=v0.50.16
-ARG OCI_CLI_VERSION=v3.71.4
+# ARG OCI_CLI_VERSION=v3.71.4
 ARG PYTHON_VERSION=3.12.12-r0
 
 USER root
@@ -35,10 +35,10 @@ RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-    # Manually patch the installation script to use uv for faster and smaller installation
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    && /usr/local/lib/hack/patch-oci-install-py.sh install.py
+# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+#     # Manually patch the installation script to use uv for faster and smaller installation
+#     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+#     && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
 #     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Install kdash
@@ -50,7 +50,6 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
 FROM alpine:3.23.0
 
 ARG PYTHON_VERSION=3.12.12-r0
-ARG OCI_CLI_VERSION=v3.71.4
 
 USER root
 
@@ -93,8 +92,14 @@ RUN ln -s /workspaces ~/workspaces \
     && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
     # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
 
-COPY --from=builder /install.py /oracle/install.py
-RUN export VIRTUAL_ENV=/oracle/oracle-cli \
+# Install oci-cli
+ARG OCI_CLI_VERSION=v3.71.4
+COPY hack /usr/local/lib/hack/
+RUN chmod +x /usr/local/lib/hack/*
+RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+    # Manually patch the installation script to use uv for faster and smaller installation
+    && export VIRTUAL_ENV=/oracle/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
