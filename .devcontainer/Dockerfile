@@ -83,12 +83,12 @@ RUN apk --no-cache add \
     python3=${PYTHON_VERSION} \
     # For install oci-cli
     # uv \
-    py3-pip \
+    # py3-pip \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
     # Set permission for utility scripts
-    && chmod -R 755 /opt/okeutil/
+    && chmod -R 755 /opt/okeutil/ \
     && chmod +x /usr/local/bin/oci_autocomplete.sh
 
 USER oracle
@@ -99,7 +99,7 @@ RUN ln -s /workspaces ~/workspaces \
     && echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile \
     && echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile \
     && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
-    && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile
+    && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
     && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
 
 # Install oci-cli
