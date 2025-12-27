@@ -58,7 +58,7 @@ COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
-COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
+# COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
 # COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
 # COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
 
