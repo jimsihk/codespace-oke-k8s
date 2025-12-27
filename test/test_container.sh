@@ -18,11 +18,11 @@ echo '****************'
 echo '*' "Testing oci performance:"
 time oci -version
 
-echo '****************'
-echo '*' "Testing oci autocomplete:"
-ls -l /usr/local/bin/oci_autocomplete.sh
-cat ~/.bash_profile | grep 'oci_autocomplete.sh'
-complete -p oci
+# echo '****************'
+# echo '*' "Testing oci autocomplete:"
+# ls -l /usr/local/bin/oci_autocomplete.sh
+# cat ~/.bash_profile | grep 'oci_autocomplete.sh'
+# complete -p oci
 
 echo '****************'
 echo '*' "Testing oke-tunnel.sh:"
