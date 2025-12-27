@@ -94,8 +94,8 @@ RUN ln -s /workspaces ~/workspaces \
 
 # Install oci-cli
 ARG OCI_CLI_VERSION=v3.71.4
-COPY hack /usr/local/lib/hack/
-RUN chmod +x /usr/local/lib/hack/*
+COPY hack /oracle/hack/
+RUN chmod +x /oracle/hack/*
 RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
     && export VIRTUAL_ENV=/oracle/oracle-cli \
