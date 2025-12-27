@@ -15,6 +15,10 @@ which okectl
 which ohelm
 
 echo '****************'
+echo '*' "Testing oci performance:"
+time oci -version
+
+echo '****************'
 echo '*' "Testing oci autocomplete:"
 complete -p oci
 
