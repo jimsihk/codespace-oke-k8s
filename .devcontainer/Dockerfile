@@ -14,8 +14,8 @@ RUN apk --no-cache add \
     openssl \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils \
-    python3=${PYTHON_VERSION} \
-    py3-pip \
+    # python3=${PYTHON_VERSION} \
+    # py3-pip \
     # Install uv to replace pip for better performance on oci-cli installation
     # uv \
     # Install kubectl
@@ -36,11 +36,11 @@ RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
 #     # Manually patch the installation script to use uv for faster and smaller installation
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    # && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
@@ -84,6 +84,7 @@ RUN apk --no-cache add \
     # For install oci-cli
     # uv \
     # py3-pip \
+    oci-cli \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
@@ -101,7 +102,8 @@ RUN ln -s /workspaces ~/workspaces \
     && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
     && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
     # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
-    && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
+    # && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
+    && cat ~/.bash_profile
 
 # Install oci-cli
 # ARG OCI_CLI_VERSION=v3.71.4
