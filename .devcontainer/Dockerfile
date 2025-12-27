@@ -89,8 +89,8 @@ RUN apk --no-cache add \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
     # Set permission for utility scripts
-    && chmod -R 755 /opt/okeutil/ \
-    && chmod +x /usr/local/bin/oci_autocomplete.sh
+    # && chmod +x /usr/local/bin/oci_autocomplete.sh \
+    && chmod -R 755 /opt/okeutil/
 
 USER oracle
 WORKDIR /oracle
