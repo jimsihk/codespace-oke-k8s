@@ -44,7 +44,7 @@ RUN chmod +x /usr/local/lib/hack/*
     #&& uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     && uv venv \
-    && uv add oci-cli
+    && uv add oci-cli=3.71.4 \
     && oci -version
 
 # Install kdash
