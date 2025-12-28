@@ -42,7 +42,7 @@ RUN chmod +x /usr/local/lib/hack/*
     #&& /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
     #&& uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-RUN uv venv \
+RUN uv init \
     && uv add oci-cli==3.71.4 \
     && oci -version
 
