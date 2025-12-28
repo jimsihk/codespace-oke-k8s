@@ -14,10 +14,10 @@ RUN apk --no-cache add \
     openssl \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils \
-    # python3=${PYTHON_VERSION} \
+    python3=${PYTHON_VERSION} \
     # py3-pip \
     # Install uv to replace pip for better performance on oci-cli installation
-    # uv \
+    uv \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
@@ -36,11 +36,12 @@ RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-#     # Manually patch the installation script to use uv for faster and smaller installation
-    # && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+    # Manually patch the installation script to use uv for faster and smaller installation
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
@@ -62,9 +63,9 @@ COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
 COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
-# COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
-# COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
-# COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
+COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
+COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
+COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
 
 COPY okeutil /opt/okeutil/
 
@@ -82,9 +83,9 @@ RUN apk --no-cache add \
     openssh-client-default \
     python3=${PYTHON_VERSION} \
     # For install oci-cli
-    # uv \
+    uv \
     # py3-pip \
-    oci-cli \
+    # oci-cli \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
