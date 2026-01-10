@@ -16,7 +16,7 @@ which ohelm
 
 echo '****************'
 echo '*' "Testing oci performance:"
-time oci -version
+time oci --debug -version
 sleep 5
 
 # echo '****************'
@@ -59,7 +59,7 @@ ocid1.bastion.oc1..testbastion
 EOF
 
 echo '*' "Testing oci setup:"
-oci iam user get --user-id 'ocid1.user.oc1..testuser'
+oci --debug iam user get --user-id 'ocid1.user.oc1..testuser'
 exit_code=$?
 echo '*' "$exit_code"
 if [ "$exit_code" -eq 0 ]; then
