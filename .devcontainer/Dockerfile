@@ -49,6 +49,8 @@ RUN chmod +x /usr/local/lib/hack/*
     #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
 RUN uv venv \
     && uv pip install oci-cli==3.71.4
+    && source .venv/bin/activate
+    && time oci --version
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
