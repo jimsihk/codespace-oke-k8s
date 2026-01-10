@@ -1,4 +1,4 @@
-FROM alpine:3.23.0 AS builder
+FROM alpine:3.23.2 AS builder
 
 ARG KUBECTL_VERSION=v1.35.0
 ARG HELM_VERSION=v3.19.4
@@ -36,16 +36,16 @@ RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-#RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
-    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    #&& /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-    #&& uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-RUN mkdir -p /usr/local/lib/oracle-cli \
-    && uv init /usr/local/lib/oracle-cli/ \
-    && uv add oci-cli==3.71.4 \
-    && oci -version
+    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+#RUN mkdir -p /usr/local/lib/oracle-cli \
+#    && uv init /usr/local/lib/oracle-cli/ \
+#    && uv add oci-cli==3.71.4 \
+#    && oci -version
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
@@ -57,7 +57,7 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
 # Build final container
 ##########################################
 
-FROM alpine:3.23.0
+FROM alpine:3.23.2
 
 ARG PYTHON_VERSION=3.12.12-r0
 
