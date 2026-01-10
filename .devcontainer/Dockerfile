@@ -42,12 +42,12 @@ RUN chmod +x /usr/local/lib/hack/*
     #&& /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
     #&& uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-RUN mkdir -p /usr/local/lib/oracle-cli \
+#RUN mkdir -p /usr/local/lib/oracle-cli \
     #&& uv init /usr/local/lib/oracle-cli/ \
     #&& uv add oci-cli==3.71.4 \
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    && uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages" \
-    && time oci -version
+    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
+RUN uv pip install oci-cli==3.71.4
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
