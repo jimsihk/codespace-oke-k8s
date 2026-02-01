@@ -1,38 +1,128 @@
-# Base image licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-FROM ghcr.io/oracle/oci-cli:latest@sha256:8c474dc8080a140475fb4318d0e7faa4a8cd1b0266b84aa57d7081f2d79f0f98
+FROM alpine:3.23.3 AS builder
+
+ARG KUBECTL_VERSION=v1.35.0
+ARG HELM_VERSION=v3.20.0
+ARG KDASH_VERSION=v0.6.2
+ARG K9S_VERSION=v0.50.18
+ARG OCI_CLI_VERSION=v3.73.1
+ARG PYTHON_VERSION=3.12.12-r0
 
 USER root
-# Install kubectl
-RUN ARCH=$(uname -m) && echo "Detected: $ARCH" && \
-    if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" && \
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH}/kubectl.sha256" && \
-    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
-    install -m 0755 kubectl /usr/local/bin/kubectl && \
-    # Install git
-    dnf --nodocs -y install git && \
-    # Clean up
-    dnf clean all && \
+RUN apk --no-cache add \
+    curl \
+    bash \
+    openssl \
+    # Replace sha256sum with GNU version for checksum in kubectl
+    coreutils \
+    python3=${PYTHON_VERSION} \
+    # py3-pip \
+    # Install uv to replace pip for better performance on oci-cli installation
+    uv \
+    # Install kubectl
+    && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
+    && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
+    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+    && curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl.sha256" \
+    && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
+    && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
-    # Install kdash
-    # Force to install musl version to avoid GLIBC error
-    curl https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh | sed "s/SUFFIX='linux.tar.gz'/SUFFIX='linux-musl.tar.gz'/" | sed "s/-gnu.tar.gz/-musl.tar.gz/g" | bash
+    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" \
+    && bash get-helm-3 --version "${HELM_VERSION}" \
+    # Install k9s
+    && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
-COPY --chown=oracle okeutil /opt/okeutil/
+COPY hack /usr/local/lib/hack/
+RUN chmod +x /usr/local/lib/hack/*
+
+# Install oci-cli
+# Replicate the logic of install.sh to download install.py directly
+RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+    # Manually patch the installation script to use uv for faster and smaller installation
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+#RUN mkdir -p /usr/local/lib/oracle-cli \
+    #&& uv init /usr/local/lib/oracle-cli/ \
+    #&& uv add oci-cli==3.71.4 \
+    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
+#RUN uv venv \
+    #&& uv pip install oci-cli==3.71.4 \
+    #&& source .venv/bin/activate \
+    #&& time oci --version
+
+# Install kdash
+RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
+    # Manually patch the installation script to support musl and specify version
+    && /usr/local/lib/hack/patch-kdash-getLatest-sh.sh getLatest.sh "${KDASH_VERSION}" \
+    && bash getLatest.sh
+
+##########################################
+# Build final container
+##########################################
+
+FROM alpine:3.23.2
+
+ARG PYTHON_VERSION=3.12.12-r0
+
+USER root
+
+COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=builder /usr/local/bin/kdash /usr/local/bin/kdash
+COPY --from=builder /root/.local/bin/k9s /usr/local/bin/k9s
+COPY --from=builder /usr/local/bin/oci /usr/local/bin/oci
+COPY --from=builder /usr/local/lib/oracle-cli /usr/local/lib/oracle-cli
+COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/bin/oci_autocomplete.sh /usr/local/bin/oci_autocomplete.sh
+
+COPY okeutil /opt/okeutil/
+
+# For install oci-cli
+# COPY hack /usr/local/lib/hack/
+# RUN chmod +x /usr/local/lib/hack/*
+
+RUN apk --no-cache add \
+    git \
+    curl \
+    bash \
+    # Install pgrep for OCI bastion session clean up
+    procps-ng \
+    # Install ssh and ssh-keygen for OCI bastion tunneling
+    openssh-client-default \
+    python3=${PYTHON_VERSION} \
+    # For install oci-cli
+    uv \
+    # py3-pip \
+    # oci-cli \
+    && rm -rf /var/cache/apk/* \
+    # Create the oracle user for backward compatibility
+    && adduser -D -h /oracle -s /bin/bash oracle \
+    # Set permission for utility scripts
+    # && chmod +x /usr/local/bin/oci_autocomplete.sh \
+    && chmod -R 755 /opt/okeutil/
 
 USER oracle
 WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
-RUN ln -s /workspaces ~/workspaces && \
-    echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bashrc && \
-    #echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bashrc && \
-    #echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bashrc && \
-    #echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bashrc && \
-    #echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bashrc && \
-    # Install k9s, with working user as webi will update .bashrc of current user
-    curl -sS https://webi.sh/k9s | sh
+RUN ln -s /workspaces ~/workspaces \
+    && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile \
+    && echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile \
+    && echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile \
+    && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
+    && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
+    # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
+    # && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
+    && cat ~/.bash_profile
 
-# Launch bash as login shell to always load the .bashrc
+# Install oci-cli
+# ARG OCI_CLI_VERSION=v3.71.4
+# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+    # Manually patch the installation script to use uv for faster and smaller installation
+    # && export VIRTUAL_ENV=/oracle/lib/oracle-cli \
+    # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    # && python install.py --accept-all-defaults --exec-dir /oracle/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+
+# Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["echo Started at $(date) && sleep infinity"]

@@ -58,7 +58,16 @@ for line in text.splitlines():
                 next_lines = text.splitlines()[text.splitlines().index(line)+1:]
                 for next_line in next_lines:
                     if 'Version:' in next_line:
-                        version = next_line.split('v')[1].strip()
+                        if 'v' in next_line:
+                            version = next_line.split('v')[1].strip()
+                        else:
+                            # Step 1: Remove ANSI escape codes
+                            cleaned_output = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', next_line)
+                            # Step 2: Clean the input by keeping only alphanumeric characters, periods, and colons
+                            cleaned_output = re.sub(r'[^a-zA-Z0-9.:]', '', cleaned_output)
+                            # Step 3: Use regex to extract version number
+                            match = re.search(r'Version:(\S+)', cleaned_output)
+                            version = match.group(1)
                         versions[tool] = version
                         break
             elif tool == 'kdash':
