@@ -1,10 +1,10 @@
-FROM alpine:3.23.2 AS builder
+FROM alpine:3.23.3 AS builder
 
 ARG KUBECTL_VERSION=v1.35.0
-ARG HELM_VERSION=v3.19.4
+ARG HELM_VERSION=v3.20.0
 ARG KDASH_VERSION=v0.6.2
-ARG K9S_VERSION=v0.50.16
-ARG OCI_CLI_VERSION=v3.71.4
+ARG K9S_VERSION=v0.50.18
+ARG OCI_CLI_VERSION=v3.73.1
 ARG PYTHON_VERSION=3.12.12-r0
 
 USER root
@@ -36,21 +36,21 @@ RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
 # Replicate the logic of install.sh to download install.py directly
-#RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
+RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
     # Manually patch the installation script to use uv for faster and smaller installation
-    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    #&& /usr/local/lib/hack/patch-oci-install-py.sh install.py \
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
     # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-    #&& uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
+    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 #RUN mkdir -p /usr/local/lib/oracle-cli \
     #&& uv init /usr/local/lib/oracle-cli/ \
     #&& uv add oci-cli==3.71.4 \
     #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
-RUN uv venv \
-    && uv pip install oci-cli==3.71.4 \
-    && source .venv/bin/activate \
-    && time oci --version
+#RUN uv venv \
+    #&& uv pip install oci-cli==3.71.4 \
+    #&& source .venv/bin/activate \
+    #&& time oci --version
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
