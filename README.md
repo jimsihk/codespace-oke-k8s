@@ -182,4 +182,4 @@ To build your own image (for customization) when creating the codespace:
 - Don't panic, just cancel the command (`Ctrl c`) and rerun, it would then work
 
 ## Credits
-Based on [Oracle oci-cli Docker Image](https://github.com/oracle/docker-images/tree/main/OracleCloudInfrastructure/oci-cli)
+Based on [Oracle oci-cli Docker Image](https://github.com/oracle/docker-images/tree/main/OracleCloudInfrastructure/oci-cli) (for v1 images)
