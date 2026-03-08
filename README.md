@@ -39,9 +39,9 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
     ```
 #### Setup local environment for OKE
 2. In the codespace, execute `init-local-oci.sh` to setup OCI configuration and create API key
-3. Copy the generated public key value and add as a key under the OCI user on OCI portal
+3. Copy the generated public key value and add as a API key under the OCI user on OCI portal
 4. In the codespace, execute `init-local-oci.sh` again to further setup
-    - Setup kubeconfig
+    - Setup kubeconfig (the setup may fail due to the API key not yet populate across OCI, retry should work ))
     - Setup bastion session configuration with SSH key generation
 5. In the codespace, execute `check-oke-connection.sh && echo $?` for verification
     - when you see the prompt like below to add RSA key fingerprint, type `yes`:
