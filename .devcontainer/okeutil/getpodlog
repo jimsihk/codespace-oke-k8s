@@ -1,16 +1,13 @@
 #!/bin/bash
 
-if [ -z "$1" ]
+if [ -z "$1" ] || [ -z "$2" ]
 then
   echo '* '"Missing parameter!"
   echo "Usage: $(basename "$0") <pod_name_key_word> <namespace> <container (optional)>"
   exit 1
 else
   echo '* '"Received:"
-  if [ -n "$2" ]
-  then
-    echo "- namespace = $2"
-  fi
+  echo "- namespace = $2"
   echo "- pod_name_key_word = $1"
   if [ -n "$3" ]
   then
@@ -25,9 +22,9 @@ then
   "$CHECKOCI"
 fi
 
-NAMESPACE="${2:-default}"
-POD_NAME_KEY_WORD="$1"
-CONTAINER="$3"
+NAMESPACE=$2
+POD_NAME_KEY_WORD=$1
+CONTAINER=$3
 
 echo '*'
 echo '* '"Available pods:"
@@ -40,19 +37,17 @@ then
   exit 1
 fi
 
-# TODO: check the container name with $3
-
 # always login to the latest pod
 POD=$(echo "$POD_LIST" | tail -1 | awk '{print $1}')
 echo '*'
 echo '* '"Entering $POD..."
 if [ -n "$3" ]
 then
-  kubectl exec -i -t -n "$NAMESPACE" "$POD" -c "$CONTAINER" -- sh -c "(bash || ash || sh)"
+  kubectl logs -n "$NAMESPACE" "$POD" -c "$CONTAINER" --timestamps=true
 else
-  kubectl exec -i -t -n "$NAMESPACE" "$POD" -- sh -c "(bash || ash || sh)"
+  kubectl logs -n "$NAMESPACE" "$POD" --timestamps=true
 fi
 echo ''
 echo '**********'
-echo '* '"Exit at $(date)"
+echo '* '"End at $(date)"
 echo '**********'

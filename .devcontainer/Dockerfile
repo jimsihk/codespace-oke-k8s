@@ -107,10 +107,6 @@ WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces \
     && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile \
-    && echo 'alias okectl=/opt/okeutil/okectl' >> ~/.bash_profile \
-    && echo 'alias ohelm=/opt/okeutil/ohelm' >> ~/.bash_profile \
-    && echo 'alias oapply=/opt/okeutil/oapply' >> ~/.bash_profile \
-    && echo 'alias odelete=/opt/okeutil/odelete' >> ~/.bash_profile \
     # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
     # && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
     && cat ~/.bash_profile
