@@ -25,7 +25,7 @@ clear
 ################################
 # Step 0a: Clean up existing connection
 ################################
-kill $(pgrep --full bastionsession) > /dev/null 2>&1
+kill $(pgrep -f bastionsession) > /dev/null 2>&1
 
 ################################
 # Step 0b: Housekeep nohup.out
@@ -60,7 +60,7 @@ PRIVATE_KEY=$(grep PRIVATE_KEY ~/.oci/custom-bastion-config | cut -d'=' -f2)
 
 # Replace with values of Kubernetes API private endpoint (or the IP of the nodes)
 # Beware to have the bastion in the VCN
-TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2)
+TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2 | cut -d':' -f1)
 TAEGET_PORT=6443
 
 ################################
@@ -89,6 +89,7 @@ if [ -z "$1" ]
 then
 	echo '* '"Creating Bastion session with $BASTION_ID..."
 	GETSESSIONCOMMAND="oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file $PUBLIC_KEY --key-type PUB --target-private-ip $TARGET_IP --target-port $TAEGET_PORT"
+	echo "$GETSESSIONCOMMAND"
 	RESULT1=$($GETSESSIONCOMMAND)
 	echo "$RESULT1"
 

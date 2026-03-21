@@ -1,0 +1,53 @@
+#!/bin/bash
+
+if [ -z "$1" ] || [ -z "$2" ]
+then
+  echo '* '"Missing parameter!"
+  echo "Usage: $(basename "$0") <pod_name_key_word> <namespace> <container (optional)>"
+  exit 1
+else
+  echo '* '"Received:"
+  echo "- namespace = $2"
+  echo "- pod_name_key_word = $1"
+  if [ -n "$3" ]
+  then
+    echo "- container = $3"
+  fi
+fi
+
+# check if connection to k8s API is ready
+CHECKOCI=/opt/okeutil/check-oke-connection.sh
+if [ -e "$CHECKOCI" ]
+then
+  "$CHECKOCI"
+fi
+
+NAMESPACE=$2
+POD_NAME_KEY_WORD=$1
+CONTAINER=$3
+
+echo '*'
+echo '* '"Available pods:"
+POD_LIST=$(kubectl get pods -n "$NAMESPACE" --sort-by=.status.startTime | grep Running | grep "$POD_NAME_KEY_WORD")
+echo "$POD_LIST"
+
+if [ -z "$POD_LIST" ]
+then
+  echo '* '"No pod available!"
+  exit 1
+fi
+
+# always login to the latest pod
+POD=$(echo "$POD_LIST" | tail -1 | awk '{print $1}')
+echo '*'
+echo '* '"Entering $POD..."
+if [ -n "$3" ]
+then
+  kubectl logs -n "$NAMESPACE" "$POD" -c "$CONTAINER" --timestamps=true
+else
+  kubectl logs -n "$NAMESPACE" "$POD" --timestamps=true
+fi
+echo ''
+echo '**********'
+echo '* '"End at $(date)"
+echo '**********'
