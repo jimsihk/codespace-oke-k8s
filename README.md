@@ -72,7 +72,19 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
       debug1: Entering interactive session.
       debug1: pledge: filesystem
       ```
-6. Verify the installed packages by executing below:
+6. **Save configurations as Codespace secrets** to auto-restore on future starts:
+    - In the codespace, execute `export-config.sh` to display base64-encoded values for all configurations
+    - For each displayed secret, go to **GitHub → Settings → Secrets and variables → Codespaces → New secret** and add:
+      | Secret name | Description |
+      |---|---|
+      | `OCI_CLI_CONFIG` | Base64 encoded `~/.oci/config` |
+      | `OCI_CLI_PRIVATE_KEY` | Base64 encoded OCI API private key (`.pem`) |
+      | `OCI_KUBECONFIG` | Base64 encoded `~/.kube/config` |
+      | `OCI_BASTION_CONFIG` | Base64 encoded `~/.oci/custom-bastion-config` |
+      | `OCI_SSH_PRIVATE_KEY` | Base64 encoded `~/.ssh/id_rsa_oci` |
+      | `OCI_SSH_PUBLIC_KEY` | Base64 encoded `~/.ssh/id_rsa_oci.pub` |
+    - From now on, all configurations are automatically restored each time the codespace starts — no manual setup required on restart or rebuild.
+7. Verify the installed packages by executing below:
    - `oci -v`, sample output:
       ```
       [oracle@codespaces-a12345 ~]$ oci -v
@@ -97,10 +109,10 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
       ...
       ...
       ```
-7. The codespace is ready for interacting with OKE!
+8. The codespace is ready for interacting with OKE!
 
 #### Optional Settings
-8. Create Linux alias to replace `kubectl` with a customized version for OKE by executing (could be useful if you would like to change to another shell):
+9. Create Linux alias to replace `kubectl` with a customized version for OKE by executing (could be useful if you would like to change to another shell):
     ```
     alias kubectl=/opt/okeutil/okectl
     alias helm=/opt/okeutil/ohelm
@@ -134,6 +146,14 @@ Actual scripts are located under `/opt/okeutil/`:
 - perform `kubectl delete -f` for all supplied yaml files
 - detect if the tunnel has been established and establish if not
 - e.g. `odelete pod1.yaml pod2.yaml` will delete both resource of pod1 and pod2
+
+`export-config.sh`
+- export all OCI, kubeconfig and bastion configurations as base64-encoded values
+- run after initial setup to obtain the values for storing as GitHub Codespace secrets
+
+`restore-from-secrets.sh`
+- automatically restore OCI, kubeconfig and bastion configurations from GitHub Codespace secrets on container start
+- called automatically via `postStartCommand` in devcontainer.json — no manual invocation needed
 
 ## Customization
 
