@@ -91,8 +91,6 @@ RUN apk --no-cache add \
     # Install ssh and ssh-keygen for OCI bastion tunneling
     openssh-client-default \
     python3=${PYTHON_VERSION} \
-    # For install oci-cli
-    uv \
     # py3-pip \
     # oci-cli \
     && rm -rf /var/cache/apk/* \

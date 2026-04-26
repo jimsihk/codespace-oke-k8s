@@ -6,6 +6,9 @@ WKDIR=`pwd`
 cd "$VIRTUAL_ENV"
 V_VENV=`basename "$VIRTUAL_ENV"`
 cd ..
-uv venv --clear "$V_VENV"
+# Use standard python3 venv (instead of uv venv) to avoid the _virtualenv.pth startup hook
+# that uv venv installs, which adds import overhead on every Python invocation at runtime.
+# uv pip is still used for fast package installation.
+python3 -m venv --without-pip --clear "$V_VENV"
 cd "$WKDIR"
 uv pip "$@"
