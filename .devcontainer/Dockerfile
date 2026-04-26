@@ -1,10 +1,10 @@
-FROM alpine:3.23.3 AS builder
+FROM alpine:3.23.4 AS builder
 
-ARG KUBECTL_VERSION=v1.35.2
-ARG HELM_VERSION=v3.20.0
-ARG KDASH_VERSION=v0.6.2
+ARG KUBECTL_VERSION=v1.36.0
+ARG HELM_VERSION=v4.1.4
+ARG KDASH_VERSION=v1.1.1
 ARG K9S_VERSION=v0.50.18
-ARG OCI_CLI_VERSION=v3.75.0
+ARG OCI_CLI_VERSION=v3.80.0
 ARG PYTHON_VERSION=3.12.12-r0
 
 USER root
@@ -62,7 +62,7 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
 # Build final container
 ##########################################
 
-FROM alpine:3.23.2
+FROM alpine:3.23.4
 
 ARG PYTHON_VERSION=3.12.12-r0
 

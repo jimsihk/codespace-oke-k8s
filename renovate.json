@@ -3,5 +3,52 @@
   "extends": [
     "config:best-practices"
   ],
-  "prHourlyLimit": 0
+  "prHourlyLimit": 0,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG KUBECTL_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubernetes/kubernetes"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG HELM_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "helm/helm"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG K9S_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "derailed/k9s"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG KDASH_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kdash-rs/kdash"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG OCI_CLI_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "oracle/oci-cli"
+    }
+  ]
 }
