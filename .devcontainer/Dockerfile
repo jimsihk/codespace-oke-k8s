@@ -62,7 +62,7 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
 # Build final container
 ##########################################
 
-FROM alpine:3.23.2
+FROM alpine:3.23.3
 
 ARG PYTHON_VERSION=3.12.12-r0
 
