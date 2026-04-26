@@ -3,5 +3,142 @@
   "extends": [
     "config:best-practices"
   ],
-  "prHourlyLimit": 0
+  "prHourlyLimit": 0,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG KUBECTL_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubernetes/kubernetes"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG HELM_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "helm/helm"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG K9S_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "derailed/k9s"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG KDASH_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kdash-rs/kdash"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG OCI_CLI_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "oracle/oci-cli"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG PYTHON_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/python3",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG CURL_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/curl",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG BASH_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/bash",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG OPENSSL_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/openssl",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG COREUTILS_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/coreutils",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG UV_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/uv",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG GIT_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/git",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG PROCPS_NG_VERSION=(?<currentValue>[\\d.]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/procps-ng",
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.devcontainer/Dockerfile$"],
+      "matchStrings": [
+        "ARG OPENSSH_VERSION=(?<currentValue>[\\d._a-z]+-r\\d+)"
+      ],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "alpine_3_23/openssh-client-default",
+      "versioningTemplate": "loose"
+    }
+  ]
 }

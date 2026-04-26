@@ -1,23 +1,28 @@
-FROM alpine:3.23.3 AS builder
+FROM alpine:3.23.4 AS builder
 
-ARG KUBECTL_VERSION=v1.35.2
-ARG HELM_VERSION=v3.20.0
-ARG KDASH_VERSION=v0.6.2
+ARG KUBECTL_VERSION=v1.36.0
+ARG HELM_VERSION=v4.1.4
+ARG KDASH_VERSION=v1.1.1
 ARG K9S_VERSION=v0.50.18
-ARG OCI_CLI_VERSION=v3.75.0
-ARG PYTHON_VERSION=3.12.12-r0
+ARG OCI_CLI_VERSION=v3.80.0
+ARG PYTHON_VERSION=3.12.13-r0
+ARG CURL_VERSION=8.17.0-r1
+ARG BASH_VERSION=5.3.3-r1
+ARG OPENSSL_VERSION=3.5.6-r0
+ARG COREUTILS_VERSION=9.8-r1
+ARG UV_VERSION=0.10.2-r0
 
 USER root
 RUN apk --no-cache add \
-    curl \
-    bash \
-    openssl \
+    curl=${CURL_VERSION} \
+    bash=${BASH_VERSION} \
+    openssl=${OPENSSL_VERSION} \
     # Replace sha256sum with GNU version for checksum in kubectl
-    coreutils \
+    coreutils=${COREUTILS_VERSION} \
     python3=${PYTHON_VERSION} \
     # py3-pip \
     # Install uv to replace pip for better performance on oci-cli installation
-    uv \
+    uv=${UV_VERSION} \
     # Install kubectl
     && ARCH="$(uname -m)" && echo "Detected: $ARCH" \
     && if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; else echo "Unsupported architecture"; exit 1; fi && echo "Converted: $ARCH" \
@@ -62,9 +67,15 @@ RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/g
 # Build final container
 ##########################################
 
-FROM alpine:3.23.2
+FROM alpine:3.23.4
 
-ARG PYTHON_VERSION=3.12.12-r0
+ARG PYTHON_VERSION=3.12.13-r0
+ARG CURL_VERSION=8.17.0-r1
+ARG BASH_VERSION=5.3.3-r1
+ARG UV_VERSION=0.10.2-r0
+ARG GIT_VERSION=2.52.0-r0
+ARG PROCPS_NG_VERSION=4.0.5-r0
+ARG OPENSSH_VERSION=10.2_p1-r0
 
 USER root
 
@@ -83,16 +94,16 @@ COPY okeutil /opt/okeutil/
 # RUN chmod +x /usr/local/lib/hack/*
 
 RUN apk --no-cache add \
-    git \
-    curl \
-    bash \
+    git=${GIT_VERSION} \
+    curl=${CURL_VERSION} \
+    bash=${BASH_VERSION} \
     # Install pgrep for OCI bastion session clean up
-    procps-ng \
+    procps-ng=${PROCPS_NG_VERSION} \
     # Install ssh and ssh-keygen for OCI bastion tunneling
-    openssh-client-default \
+    openssh-client-default=${OPENSSH_VERSION} \
     python3=${PYTHON_VERSION} \
     # For install oci-cli
-    uv \
+    uv=${UV_VERSION} \
     # py3-pip \
     # oci-cli \
     && rm -rf /var/cache/apk/* \
