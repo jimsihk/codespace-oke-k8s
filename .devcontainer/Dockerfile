@@ -40,22 +40,20 @@ COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
-# Replicate the logic of install.sh to download install.py directly
-RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-    # Manually patch the installation script to use uv for faster and smaller installation
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-#RUN mkdir -p /usr/local/lib/oracle-cli \
-    #&& uv init /usr/local/lib/oracle-cli/ \
-    #&& uv add oci-cli==3.71.4 \
-    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
-#RUN uv venv \
-    #&& uv pip install oci-cli==3.71.4 \
-    #&& source .venv/bin/activate \
-    #&& time oci --version
+# Use direct venv + uv pip (bypasses install.py) to eliminate double-invocation overhead
+# and ensure bytecode is compiled, giving fast startup at runtime.
+RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    # Create a standard Python venv (no _virtualenv.pth startup hooks from uv venv)
+    && python3 -m venv --without-pip "$VIRTUAL_ENV" \
+    # Install oci-cli with explicit bytecode compilation for fast module loading at runtime
+    # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
+    && uv pip install --compile-bytecode "oci-cli==${OCI_CLI_VERSION#v}" \
+    # Remove any _virtualenv startup hooks that may have been injected by uv or dependencies
+    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
+    # Ensure all .pyc files are compiled (belt-and-suspenders; avoids cold-compile on first run)
+    && python3 -m compileall -q "${VIRTUAL_ENV}/lib/" \
+    # Copy the pip-generated oci entry-point script to PATH
+    && cp "${VIRTUAL_ENV}/bin/oci" /usr/local/bin/oci
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
