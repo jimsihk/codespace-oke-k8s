@@ -15,7 +15,9 @@ RUN apk --no-cache add python3=${PYTHON_VERSION} uv=${UV_VERSION} \
     && python3 -m venv --without-pip "$VIRTUAL_ENV" \
     # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
     && uv pip install --compile-bytecode "oci-cli==${OCI_CLI_VERSION#v}" \
-    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete
+    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
+    && cd "${VIRTUAL_ENV}/lib" \
+    && find . -type f -name '*.pyc' | tar -cf /tmp/oci-pyc.tar -T -
 
 ##########################################
 # Main builder stage (target architecture)
@@ -77,14 +79,9 @@ RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
 # Overlay pre-compiled Python bytecode from the native (BUILDPLATFORM) build.
 # Python .pyc files are architecture-independent for the same Python version,
 # so this provides fast oci startup on all target architectures without QEMU overhead.
-COPY --from=oci-pyc-builder /usr/local/lib/oracle-cli/lib /tmp/oci-pyc
-RUN cd /tmp/oci-pyc \
-    && find . -type d -name '__pycache__' | while IFS= read -r d; do \
-        target="/usr/local/lib/oracle-cli/lib/${d#./}"; \
-        mkdir -p "$target"; \
-        cp -a "$d/." "$target/"; \
-    done \
-    && rm -rf /tmp/oci-pyc
+COPY --from=oci-pyc-builder /tmp/oci-pyc.tar /tmp/oci-pyc.tar
+RUN tar -xf /tmp/oci-pyc.tar -C /usr/local/lib/oracle-cli/lib \
+    && rm -f /tmp/oci-pyc.tar
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
