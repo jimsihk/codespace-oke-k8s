@@ -1,3 +1,25 @@
+##########################################
+# Native bytecode compiler stage
+# Runs on the BUILD platform (e.g. amd64) regardless of the target platform.
+# Python .pyc bytecode is architecture-independent for the same Python version,
+# so we compile once natively (fast) and copy __pycache__ dirs to any target arch.
+##########################################
+FROM --platform=$BUILDPLATFORM alpine:3.23.4 AS oci-pyc-builder
+
+ARG PYTHON_VERSION=3.12.13-r0
+ARG UV_VERSION=0.10.2-r0
+ARG OCI_CLI_VERSION=v3.80.0
+
+RUN apk --no-cache add python3=${PYTHON_VERSION} uv=${UV_VERSION} \
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && python3 -m venv --without-pip "$VIRTUAL_ENV" \
+    # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
+    && uv pip install --compile-bytecode "oci-cli==${OCI_CLI_VERSION#v}" \
+    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete
+
+##########################################
+# Main builder stage (target architecture)
+##########################################
 FROM alpine:3.23.4 AS builder
 
 ARG KUBECTL_VERSION=v1.36.0
@@ -40,20 +62,29 @@ COPY hack /usr/local/lib/hack/
 RUN chmod +x /usr/local/lib/hack/*
 
 # Install oci-cli
-# Use direct venv + uv pip (bypasses install.py) to eliminate double-invocation overhead
-# and ensure bytecode is compiled, giving fast startup at runtime.
+# Install packages for the target architecture without bytecode compilation;
+# bytecode will be overlaid from the native oci-pyc-builder stage below.
 RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     # Create a standard Python venv (no _virtualenv.pth startup hooks from uv venv)
     && python3 -m venv --without-pip "$VIRTUAL_ENV" \
-    # Install oci-cli with explicit bytecode compilation for fast module loading at runtime
     # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
-    && uv pip install --compile-bytecode "oci-cli==${OCI_CLI_VERSION#v}" \
+    && uv pip install "oci-cli==${OCI_CLI_VERSION#v}" \
     # Remove any _virtualenv startup hooks that may have been injected by uv or dependencies
     && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
-    # Ensure all .pyc files are compiled (belt-and-suspenders; avoids cold-compile on first run)
-    && python3 -m compileall -q "${VIRTUAL_ENV}/lib/" \
     # Copy the pip-generated oci entry-point script to PATH
     && cp "${VIRTUAL_ENV}/bin/oci" /usr/local/bin/oci
+
+# Overlay pre-compiled Python bytecode from the native (BUILDPLATFORM) build.
+# Python .pyc files are architecture-independent for the same Python version,
+# so this provides fast oci startup on all target architectures without QEMU overhead.
+COPY --from=oci-pyc-builder /usr/local/lib/oracle-cli/lib /tmp/oci-pyc
+RUN cd /tmp/oci-pyc \
+    && find . -type d -name '__pycache__' | while IFS= read -r d; do \
+        target="/usr/local/lib/oracle-cli/lib/${d#./}"; \
+        mkdir -p "$target"; \
+        cp -a "$d/." "$target/"; \
+    done \
+    && rm -rf /tmp/oci-pyc
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
