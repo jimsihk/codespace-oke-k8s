@@ -14,8 +14,12 @@ RUN apk --no-cache add python3=${PYTHON_VERSION} uv=${UV_VERSION} \
     && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
     && python3 -m venv --without-pip "$VIRTUAL_ENV" \
     # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
-    && uv pip install --compile-bytecode "oci-cli==${OCI_CLI_VERSION#v}" \
+    && uv pip install "oci-cli==${OCI_CLI_VERSION#v}" \
     && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
+    # Rebuild all .pyc files as checked-hash bytecode so they remain valid when overlaid
+    # onto the target-architecture venv, whose source mtimes differ from this native stage.
+    && find "${VIRTUAL_ENV}/lib" -type f -name '*.pyc' -delete \
+    && python3 -m compileall -q -f -j 0 --invalidation-mode checked-hash "${VIRTUAL_ENV}/lib" \
     && cd "${VIRTUAL_ENV}/lib" \
     && find . -type f -name '*.pyc' | tar -cf /tmp/oci-pyc.tar -T -
 
