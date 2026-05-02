@@ -22,7 +22,7 @@ RUN apk --no-cache add python3=${PYTHON_VERSION} uv=${UV_VERSION} \
     && python3 -m compileall -q -f -j 0 --invalidation-mode checked-hash "${VIRTUAL_ENV}/lib" \
     && cd "${VIRTUAL_ENV}/lib" \
     && find . -type f -name '*.pyc' > /tmp/oci-pyc.list \
-    && [ -s /tmp/oci-pyc.list ] \
+    && [ -s /tmp/oci-pyc.list ] || { echo "No compiled OCI bytecode files were generated" >&2; exit 1; } \
     && tar -cf /tmp/oci-pyc.tar -T /tmp/oci-pyc.list \
     && rm -f /tmp/oci-pyc.list
 
