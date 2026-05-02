@@ -44,6 +44,9 @@ ARG COREUTILS_VERSION=9.8-r1
 ARG UV_VERSION=0.10.2-r0
 
 USER root
+COPY hack/ /usr/local/lib/hack/
+RUN chmod +x /usr/local/lib/hack/*.sh
+
 RUN apk --no-cache add \
     curl=${CURL_VERSION} \
     bash=${BASH_VERSION} \
@@ -61,14 +64,9 @@ RUN apk --no-cache add \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
-    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" \
-    && bash get-helm-3 --version "${HELM_VERSION}" \
+    && /usr/local/lib/hack/install-helm.sh "${HELM_VERSION}" \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
-
-COPY hack/patch-kdash-getLatest-sh.sh /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
-RUN chmod +x /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
-
 # Install oci-cli
 # Install packages for the target architecture without bytecode compilation;
 # bytecode will be overlaid from the native oci-pyc-builder stage below.
