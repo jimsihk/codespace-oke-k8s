@@ -70,6 +70,7 @@ RUN apk --no-cache add \
     && HELM_INSTALL_SCRIPT="get-helm-${HELM_MAJOR_VERSION}" \
     && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/${HELM_INSTALL_SCRIPT}" \
     && bash "${HELM_INSTALL_SCRIPT}" --version "${HELM_VERSION}" \
+    && rm -f "${HELM_INSTALL_SCRIPT}" \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
