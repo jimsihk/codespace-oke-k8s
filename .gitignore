@@ -1,2 +1,4 @@
 nohup.out
 *.pem
+__pycache__/
+*.pyc
