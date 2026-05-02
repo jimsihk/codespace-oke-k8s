@@ -7,7 +7,7 @@ then
   HELM_VERSION="$1"
 elif [ -n "${HELM_VERSION:-}" ]
 then
-  HELM_VERSION="${HELM_VERSION}"
+  :
 else
   echo "Usage: $0 <helm-version>" >&2
   exit 1
