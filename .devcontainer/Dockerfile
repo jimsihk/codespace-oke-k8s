@@ -61,9 +61,9 @@ RUN apk --no-cache add \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
-    && HELM_MAJOR_VERSION="${HELM_VERSION#v}" \
-    && HELM_MAJOR_VERSION="${HELM_MAJOR_VERSION%%.*}" \
-    && case "${HELM_MAJOR_VERSION}" in ''|*[!0-9]*) echo "Invalid HELM_VERSION format: expected vX.Y.Z or X.Y.Z but got ${HELM_VERSION}. Please set HELM_VERSION to a valid semantic version such as v3.12.0 or 3.12.0." >&2; exit 1;; esac \
+    && HELM_VERSION_NO_PREFIX="${HELM_VERSION#v}" \
+    && if ! printf '%s\n' "${HELM_VERSION}" | grep -Eq '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then echo "Invalid HELM_VERSION format: expected vX.Y.Z or X.Y.Z but got ${HELM_VERSION}. Please set HELM_VERSION to a valid semantic version such as v3.12.0 or 3.12.0." >&2; exit 1; fi \
+    && HELM_MAJOR_VERSION="${HELM_VERSION_NO_PREFIX%%.*}" \
     && HELM_INSTALL_SCRIPT="get-helm-${HELM_MAJOR_VERSION}" \
     && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/${HELM_INSTALL_SCRIPT}" \
     && bash "${HELM_INSTALL_SCRIPT}" --version "${HELM_VERSION}" \
