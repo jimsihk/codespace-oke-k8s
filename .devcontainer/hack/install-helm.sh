@@ -22,12 +22,20 @@ fi
 HELM_VERSION_NO_PREFIX="${HELM_VERSION#v}"
 HELM_MAJOR_VERSION="${HELM_VERSION_NO_PREFIX%%.*}"
 HELM_INSTALL_SCRIPT="get-helm-${HELM_MAJOR_VERSION}"
+HELM_WORKDIR="$(mktemp -d)"
 
 cleanup() {
-  rm -f "${HELM_INSTALL_SCRIPT}"
+  rm -rf "${HELM_WORKDIR}"
 }
 
 trap cleanup EXIT
 
-curl -fsSLO "https://raw.githubusercontent.com/helm/helm/main/scripts/${HELM_INSTALL_SCRIPT}"
-bash "${HELM_INSTALL_SCRIPT}" --version "${HELM_VERSION}"
+cd "${HELM_WORKDIR}"
+
+if ! curl -fsSLO "https://raw.githubusercontent.com/helm/helm/main/scripts/${HELM_INSTALL_SCRIPT}"
+then
+  echo "Failed to download Helm installer script ${HELM_INSTALL_SCRIPT} for version ${HELM_VERSION}" >&2
+  exit 1
+fi
+
+bash "./${HELM_INSTALL_SCRIPT}" --version "${HELM_VERSION}"
