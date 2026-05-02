@@ -61,8 +61,8 @@ RUN apk --no-cache add \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
-    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" \
-    && bash get-helm-3 --version "${HELM_VERSION}" \
+    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4" \
+    && bash get-helm-4 --version "${HELM_VERSION}" \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
