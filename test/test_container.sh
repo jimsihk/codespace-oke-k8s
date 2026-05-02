@@ -16,7 +16,7 @@ which ohelm
 
 echo '****************'
 echo '*' "Testing oci performance:"
-time oci --debug -version
+time oci --version
 sleep 5
 
 # echo '****************'

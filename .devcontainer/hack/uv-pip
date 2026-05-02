@@ -35,7 +35,7 @@ if [ "$1" = "install" ]; then
     find "${VIRTUAL_ENV}/lib" -name '_virtualenv.pth' -delete 2>/dev/null || true
     find "${VIRTUAL_ENV}/lib" -name '_virtualenv.py' -delete 2>/dev/null || true
     # Ensure complete bytecode compilation (belt-and-suspenders)
-    python3 -m compileall -q "${VIRTUAL_ENV}/lib" 2>/dev/null || true
+    python3 -m compileall -q --invalidation-mode checked-hash "${VIRTUAL_ENV}/lib" 2>/dev/null || true
 else
     uv pip "$@"
 fi

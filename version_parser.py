@@ -67,6 +67,9 @@ for line in text.splitlines():
                             cleaned_output = re.sub(r'[^a-zA-Z0-9.:]', '', cleaned_output)
                             # Step 3: Use regex to extract version number
                             match = re.search(r'Version:(\S+)', cleaned_output)
+                            if not match:
+                                print("Warning: Unable to parse k9s version.", file=sys.stderr)
+                                continue
                             version = match.group(1)
                         versions[tool] = version
                         break
