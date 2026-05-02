@@ -61,8 +61,12 @@ RUN apk --no-cache add \
     && echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check \
     && install -m 0755 kubectl /usr/local/bin/kubectl \
     # Install helm
-    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4" \
-    && bash get-helm-4 --version "${HELM_VERSION}" \
+    && HELM_MAJOR_VERSION="${HELM_VERSION#v}" \
+    && HELM_MAJOR_VERSION="${HELM_MAJOR_VERSION%%.*}" \
+    && case "${HELM_MAJOR_VERSION}" in ''|*[!0-9]*) echo "Unsupported HELM_VERSION: ${HELM_VERSION}" >&2; exit 1;; esac \
+    && HELM_INSTALL_SCRIPT="get-helm-${HELM_MAJOR_VERSION}" \
+    && curl -LO "https://raw.githubusercontent.com/helm/helm/main/scripts/${HELM_INSTALL_SCRIPT}" \
+    && bash "${HELM_INSTALL_SCRIPT}" --version "${HELM_VERSION}" \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
