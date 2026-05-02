@@ -17,6 +17,8 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Harden runner
@@ -64,6 +66,8 @@ jobs:
 
   test-packages:
     needs: build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Harden runner
@@ -98,6 +102,8 @@ jobs:
 
   test-scripts:
     needs: build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Harden runner
@@ -125,6 +131,8 @@ jobs:
 
   test-entrypoint:
     needs: build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Harden runner

@@ -48,16 +48,16 @@ run_scripts_test() {
     "${TEST_IMAGE}" \
     "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; exit \$?"
   STATUS="$?"
+  echo "Clean oci-emulator"
+  docker kill "${OCI_CONTAINER_ID}"
+  docker network rm data-network
   if [ "${STATUS}" -eq 0 ]; then
     echo "Passed"
   else
     echo "Failed"
-    docker kill "${OCI_CONTAINER_ID}"
     exit "${STATUS}"
   fi
   unset STATUS
-  echo "Clean oci-emulator"
-  docker kill "${OCI_CONTAINER_ID}"
   echo "....."
 }
 
