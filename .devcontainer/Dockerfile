@@ -51,7 +51,6 @@ RUN apk --no-cache add \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils=${COREUTILS_VERSION} \
     python3=${PYTHON_VERSION} \
-    # py3-pip \
     # Install uv to replace pip for better performance on oci-cli installation
     uv=${UV_VERSION} \
     # Install kubectl
@@ -67,8 +66,8 @@ RUN apk --no-cache add \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
-COPY hack /usr/local/lib/hack/
-RUN chmod +x /usr/local/lib/hack/*
+COPY hack/patch-kdash-getLatest-sh.sh /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
+RUN chmod +x /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
 
 # Install oci-cli
 # Install packages for the target architecture without bytecode compilation;
@@ -121,10 +120,6 @@ COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/
 
 COPY okeutil /opt/okeutil/
 
-# For install oci-cli
-# COPY hack /usr/local/lib/hack/
-# RUN chmod +x /usr/local/lib/hack/*
-
 RUN apk --no-cache add \
     git=${GIT_VERSION} \
     curl=${CURL_VERSION} \
@@ -134,13 +129,10 @@ RUN apk --no-cache add \
     # Install ssh and ssh-keygen for OCI bastion tunneling
     openssh-client-default=${OPENSSH_VERSION} \
     python3=${PYTHON_VERSION} \
-    # py3-pip \
-    # oci-cli \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
     # Set permission for utility scripts
-    # && chmod +x /usr/local/bin/oci_autocomplete.sh \
     && chmod -R 755 /opt/okeutil/
 
 USER oracle
@@ -148,17 +140,7 @@ WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces \
     && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile \
-    # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
-    # && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
     && cat ~/.bash_profile
-
-# Install oci-cli
-# ARG OCI_CLI_VERSION=v3.71.4
-# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-    # Manually patch the installation script to use uv for faster and smaller installation
-    # && export VIRTUAL_ENV=/oracle/lib/oracle-cli \
-    # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    # && python install.py --accept-all-defaults --exec-dir /oracle/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]

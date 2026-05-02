@@ -87,9 +87,12 @@ fi
 # Create Bastion session and forward rule
 if [ -z "$1" ]
 then
-	echo '* '"Creating Bastion session with $BASTION_ID..."
+ 	echo '* '"Creating Bastion session with $BASTION_ID..."
 	GETSESSIONCOMMAND="oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file $PUBLIC_KEY --key-type PUB --target-private-ip $TARGET_IP --target-port $TAEGET_PORT"
-	echo "$GETSESSIONCOMMAND"
+	if [ "${OKE_TUNNEL_DEBUG:-0}" = "1" ]
+	then
+		echo "$GETSESSIONCOMMAND"
+	fi
 	RESULT1=$($GETSESSIONCOMMAND)
 	echo "$RESULT1"
 
@@ -127,6 +130,10 @@ done
 sleep 5
 SSHCOMMAND=$(echo "$SSHTEMPLATE" | sed 's/ssh/ssh -v/g' | sed "s/<privateKey>/${PRIVATE_KEY//\//\\/}/g" | sed 's/<localPort>/6443/g')
 
-echo '* Running: '"$SSHCOMMAND"
+echo '* Starting SSH tunnel...'
+if [ "${OKE_TUNNEL_DEBUG:-0}" = "1" ]
+then
+	echo "$SSHCOMMAND"
+fi
 
 $SSHCOMMAND
