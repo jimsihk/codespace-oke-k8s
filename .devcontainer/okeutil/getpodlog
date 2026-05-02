@@ -40,7 +40,7 @@ fi
 # always login to the latest pod
 POD=$(echo "$POD_LIST" | tail -1 | awk '{print $1}')
 echo '*'
-echo '* '"Entering $POD..."
+echo '* '"Showing logs for $POD..."
 if [ -n "$3" ]
 then
   kubectl logs -n "$NAMESPACE" "$POD" -c "$CONTAINER" --timestamps=true

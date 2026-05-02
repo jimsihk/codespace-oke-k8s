@@ -1,3 +1,34 @@
+##########################################
+# Native bytecode compiler stage
+# Runs on the BUILD platform (e.g. amd64) regardless of the target platform.
+# Python .pyc bytecode is architecture-independent for the same Python version,
+# so we compile once natively (fast) and copy __pycache__ dirs to any target arch.
+##########################################
+FROM --platform=$BUILDPLATFORM alpine:3.23.4 AS oci-pyc-builder
+
+ARG PYTHON_VERSION=3.12.13-r0
+ARG UV_VERSION=0.10.2-r0
+ARG OCI_CLI_VERSION=v3.80.0
+
+RUN apk --no-cache add python3=${PYTHON_VERSION} uv=${UV_VERSION} \
+    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    && python3 -m venv --without-pip "$VIRTUAL_ENV" \
+    # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
+    && uv pip install "oci-cli==${OCI_CLI_VERSION#v}" \
+    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
+    # Rebuild all .pyc files as checked-hash bytecode so they remain valid when overlaid
+    # onto the target-architecture venv, whose source mtimes differ from this native stage.
+    && find "${VIRTUAL_ENV}/lib" -type f -name '*.pyc' -delete \
+    && python3 -m compileall -q -f -j 0 --invalidation-mode checked-hash "${VIRTUAL_ENV}/lib" \
+    && cd "${VIRTUAL_ENV}/lib" \
+    && find . -type f -name '*.pyc' > /tmp/oci-pyc.list \
+    && [ -s /tmp/oci-pyc.list ] || { echo "No compiled OCI bytecode files were generated" >&2; exit 1; } \
+    && tar -cf /tmp/oci-pyc.tar -T /tmp/oci-pyc.list \
+    && rm -f /tmp/oci-pyc.list
+
+##########################################
+# Main builder stage (target architecture)
+##########################################
 FROM alpine:3.23.4 AS builder
 
 ARG KUBECTL_VERSION=v1.36.0
@@ -20,7 +51,6 @@ RUN apk --no-cache add \
     # Replace sha256sum with GNU version for checksum in kubectl
     coreutils=${COREUTILS_VERSION} \
     python3=${PYTHON_VERSION} \
-    # py3-pip \
     # Install uv to replace pip for better performance on oci-cli installation
     uv=${UV_VERSION} \
     # Install kubectl
@@ -36,26 +66,28 @@ RUN apk --no-cache add \
     # Install k9s
     && curl -sS "https://webi.sh/k9s@${K9S_VERSION}" | sh
 
-COPY hack /usr/local/lib/hack/
-RUN chmod +x /usr/local/lib/hack/*
+COPY hack/patch-kdash-getLatest-sh.sh /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
+RUN chmod +x /usr/local/lib/hack/patch-kdash-getLatest-sh.sh
 
 # Install oci-cli
-# Replicate the logic of install.sh to download install.py directly
-RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-    # Manually patch the installation script to use uv for faster and smaller installation
-    && export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    # && python install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-    && uv run install.py --accept-all-defaults --exec-dir /usr/local/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
-#RUN mkdir -p /usr/local/lib/oracle-cli \
-    #&& uv init /usr/local/lib/oracle-cli/ \
-    #&& uv add oci-cli==3.71.4 \
-    #&& export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
-    #&& uv pip install oci-cli==3.71.4 --target "${VIRTUAL_ENV}/lib/python3.12/site-packages"
-#RUN uv venv \
-    #&& uv pip install oci-cli==3.71.4 \
-    #&& source .venv/bin/activate \
-    #&& time oci --version
+# Install packages for the target architecture without bytecode compilation;
+# bytecode will be overlaid from the native oci-pyc-builder stage below.
+RUN export VIRTUAL_ENV=/usr/local/lib/oracle-cli \
+    # Create a standard Python venv (no _virtualenv.pth startup hooks from uv venv)
+    && python3 -m venv --without-pip "$VIRTUAL_ENV" \
+    # OCI_CLI_VERSION is expected in 'vX.Y.Z' format; strip leading 'v' for PyPI package version
+    && uv pip install "oci-cli==${OCI_CLI_VERSION#v}" \
+    # Remove any _virtualenv startup hooks that may have been injected by uv or dependencies
+    && find "${VIRTUAL_ENV}/lib" \( -name '_virtualenv.pth' -o -name '_virtualenv.py' \) -delete \
+    # Copy the pip-generated oci entry-point script to PATH
+    && cp "${VIRTUAL_ENV}/bin/oci" /usr/local/bin/oci
+
+# Overlay pre-compiled Python bytecode from the native (BUILDPLATFORM) build.
+# Python .pyc files are architecture-independent for the same Python version,
+# so this provides fast oci startup on all target architectures without QEMU overhead.
+COPY --from=oci-pyc-builder /tmp/oci-pyc.tar /tmp/oci-pyc.tar
+RUN tar -xf /tmp/oci-pyc.tar -C /usr/local/lib/oracle-cli/lib \
+    && rm -f /tmp/oci-pyc.tar
 
 # Install kdash
 RUN curl -LO "https://raw.githubusercontent.com/kdash-rs/kdash/main/deployment/getLatest.sh" \
@@ -72,7 +104,6 @@ FROM alpine:3.23.4
 ARG PYTHON_VERSION=3.12.13-r0
 ARG CURL_VERSION=8.17.0-r1
 ARG BASH_VERSION=5.3.3-r1
-ARG UV_VERSION=0.10.2-r0
 ARG GIT_VERSION=2.52.0-r0
 ARG PROCPS_NG_VERSION=4.0.5-r0
 ARG OPENSSH_VERSION=10.2_p1-r0
@@ -89,10 +120,6 @@ COPY --from=builder /usr/local/lib/oracle-cli/lib/python*/site-packages/oci_cli/
 
 COPY okeutil /opt/okeutil/
 
-# For install oci-cli
-# COPY hack /usr/local/lib/hack/
-# RUN chmod +x /usr/local/lib/hack/*
-
 RUN apk --no-cache add \
     git=${GIT_VERSION} \
     curl=${CURL_VERSION} \
@@ -102,15 +129,10 @@ RUN apk --no-cache add \
     # Install ssh and ssh-keygen for OCI bastion tunneling
     openssh-client-default=${OPENSSH_VERSION} \
     python3=${PYTHON_VERSION} \
-    # For install oci-cli
-    uv=${UV_VERSION} \
-    # py3-pip \
-    # oci-cli \
     && rm -rf /var/cache/apk/* \
     # Create the oracle user for backward compatibility
     && adduser -D -h /oracle -s /bin/bash oracle \
     # Set permission for utility scripts
-    # && chmod +x /usr/local/bin/oci_autocomplete.sh \
     && chmod -R 755 /opt/okeutil/
 
 USER oracle
@@ -118,17 +140,7 @@ WORKDIR /oracle
 # Always create symbolic link to /workspaces as GitHub only clones only after build
 RUN ln -s /workspaces ~/workspaces \
     && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bash_profile \
-    # && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
-    # && echo 'source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bash_profile
     && cat ~/.bash_profile
-
-# Install oci-cli
-# ARG OCI_CLI_VERSION=v3.71.4
-# RUN curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/${OCI_CLI_VERSION}/scripts/install/install.py" \
-    # Manually patch the installation script to use uv for faster and smaller installation
-    # && export VIRTUAL_ENV=/oracle/lib/oracle-cli \
-    # && /usr/local/lib/hack/patch-oci-install-py.sh install.py \
-    # && python install.py --accept-all-defaults --exec-dir /oracle/bin --install-dir "${VIRTUAL_ENV}" --oci-cli-version "${OCI_CLI_VERSION}"
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
