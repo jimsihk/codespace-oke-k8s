@@ -16,7 +16,142 @@ env:
   IMAGE_PLATFORM: linux/amd64,linux/arm64
 
 jobs:
-  build-container:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
+
+      - name: Build
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        with:
+          context: "{{defaultContext}}:.devcontainer"
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
+          provenance: false
+          load: true
+
+      - name: Compute image size
+        run: |
+          echo "Uncompressed image size: $(docker images "${{ env.IMAGE_NAME }}:test" --format "{{.Size}}")" > /tmp/image_size.txt 2>&1
+          echo "Compressed image size: $(docker save "${{ env.IMAGE_NAME }}:test" | gzip -c | wc -c | numfmt --to=iec-i --suffix=B --format="%9.2f")" >> /tmp/image_size.txt 2>&1
+          cat /tmp/image_size.txt
+
+      - name: Save image
+        run: docker save "${{ env.IMAGE_NAME }}:test" -o /tmp/test-image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/test-image.tar
+          retention-days: 1
+
+      - name: Upload image size artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-size
+          path: /tmp/image_size.txt
+          retention-days: 1
+
+  test-packages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load -i /tmp/test-image.tar
+
+      - name: Test installed packages
+        run: |
+          cd test
+          ./run_tests.sh "${{ env.IMAGE_NAME }}:test" packages
+          cd ..
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-result
+          path: /tmp/test_result.txt
+          retention-days: 1
+
+  test-scripts:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load -i /tmp/test-image.tar
+
+      - name: Test custom scripts
+        run: |
+          cd test
+          ./run_tests.sh "${{ env.IMAGE_NAME }}:test" scripts
+          cd ..
+
+  test-entrypoint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load -i /tmp/test-image.tar
+
+      - name: Test entrypoint
+        run: |
+          cd test
+          ./run_tests.sh "${{ env.IMAGE_NAME }}:test" entrypoint
+          cd ..
+
+  publish:
+    needs: [test-packages, test-scripts, test-entrypoint]
     permissions:
       contents: write # for ncipollo/release-action to create release
       packages: write # for docker/build-push-action to store image to package
@@ -27,7 +162,7 @@ jobs:
         uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
         with:
           egress-policy: audit
-    
+
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -53,22 +188,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
 
-      - name: Build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
-        with:
-          context: "{{defaultContext}}:.devcontainer"
-          push: false
-          tags: ${{ env.IMAGE_NAME }}:test
-          provenance: false
-          load: true
-
-      - name: Test
-        run: |
-          pwd
-          cd test
-          ./run_tests.sh "${{ env.IMAGE_NAME }}:test"
-          cd ..
-
       - name: Multi-arch build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
@@ -92,6 +211,18 @@ jobs:
           generateReleaseNotes: true
           prerelease: ${{ github.event_name == 'pull_request' }}
 
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result
+          path: /tmp
+
+      - name: Download image size
+        uses: actions/download-artifact@v4
+        with:
+          name: image-size
+          path: /tmp
+
       - name: Generate tool version details
         run: |
           # Tool versions
@@ -111,10 +242,9 @@ jobs:
         with:
           is_append_body: true
           body_path: /tmp/vnote.txt
-          
+
       - name: Update PR with tool version
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
         with:
           file-path: /tmp/vnote.txt
-          

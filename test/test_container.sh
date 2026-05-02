@@ -16,8 +16,17 @@ which ohelm
 
 echo '****************'
 echo '*' "Testing oci performance:"
-time oci --version
-sleep 5
+OCI_START_NS=$(date +%s%N)
+oci --version
+OCI_END_NS=$(date +%s%N)
+OCI_ELAPSED_MS=$(( (OCI_END_NS - OCI_START_NS) / 1000000 ))
+echo '*' "oci --version took ${OCI_ELAPSED_MS}ms"
+if [ "${OCI_ELAPSED_MS}" -ge 1000 ]; then
+  echo '*' "Failed: oci --version response time ${OCI_ELAPSED_MS}ms >= 1000ms"
+  exit 1
+else
+  echo '*' "Passed: oci --version response time ${OCI_ELAPSED_MS}ms < 1000ms"
+fi
 
 # echo '****************'
 # echo '*' "Testing oci autocomplete:"
