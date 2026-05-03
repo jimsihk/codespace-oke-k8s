@@ -22,7 +22,7 @@ sleep 5
 echo '****************'
 echo '*' "Testing oci autocomplete:"
 ls -l /usr/local/bin/oci_autocomplete.sh
-bash -lc 'complete -p oci | grep "_oci_completion oci"'
+bash -lc 'complete -p oci | grep -q "_oci_completion oci"'
 
 echo '****************'
 echo '*' "Testing oke-tunnel.sh:"
