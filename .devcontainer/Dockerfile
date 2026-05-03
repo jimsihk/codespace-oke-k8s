@@ -140,9 +140,7 @@ WORKDIR /oracle
 RUN ln -s /workspaces ~/workspaces \
     && echo 'export PATH="/opt/okeutil:$PATH"' >> ~/.bashrc \
     && echo '[[ -e "/usr/local/bin/oci_autocomplete.sh" ]] && source "/usr/local/bin/oci_autocomplete.sh"' >> ~/.bashrc \
-    && echo '[ -f ~/.bashrc ] && . ~/.bashrc' >> ~/.bash_profile \
-    && cat ~/.bashrc \
-    && cat ~/.bash_profile
+    && echo '[ -f ~/.bashrc ] && . ~/.bashrc' >> ~/.bash_profile
 
 # Launch bash as login shell to always load the .bash_profile
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
