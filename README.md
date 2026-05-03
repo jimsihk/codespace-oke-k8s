@@ -76,24 +76,24 @@ This could also be used for interacting with other resources on Oracle Cloud Inf
    - `oci -v`, sample output:
       ```
       [oracle@codespaces-a12345 ~]$ oci -v
-      3.25.0
+      3.80.0
       ```
    - `git --version`, sample output:
       ```
       [oracle@codespaces-a12345 ~]$ git --version
-      git version 2.31.1
+      git version 2.52.0
       ```
    - `helm version`, sample output:
       ```
-      oracle@codespaces-a12345 ~]$ helm version
-      version.BuildInfo{Version:"v3.11.2", GitCommit:"912ebc1cd10d38d340f048efaf0abda047c3468e", GitTreeState:"clean", GoVersion:"go1.18.10"}
+      [oracle@codespaces-a12345 ~]$ helm version
+      version.BuildInfo{Version:"v4.1.4", GitCommit:"...", GitTreeState:"clean", GoVersion:"go1.23.4"}
       ```
    - `kubectl version`, sample output:
      - _Note: will hang for a while if connection to OKE is not established_
       ```
       [oracle@codespaces-a12345 ~]$ kubectl version
-      Client Version: version.Info{Major:"1", Minor:"26", GitVersion:"v1.26.3", GitCommit:"9e644106593f3f4aa98f8a84b23db5fa378900bd", GitTreeState:"clean", BuildDate:"2023-03-15T13:40:17Z", GoVersion:"go1.19.7", Compiler:"gc", Platform:"linux/amd64"}
-      Kustomize Version: v4.5.7
+      Client Version: v1.36.0
+      Kustomize Version: v5.6.0
       ...
       ...
       ```
@@ -114,6 +114,7 @@ Actual scripts are located under `/opt/okeutil/`:
 
 `oke-tunnel.sh`
 - establish the SSH tunnel to the K8S API endpoint, run with `nohup oke-tunnel.sh &` to establish the tunnel in the background
+- set environment variable `OKE_TUNNEL_DEBUG=1` to print verbose SSH and OCI command details
 
 `check-oke-connection.sh`
 - check if the SSH tunnel has been established and establish if not
@@ -126,19 +127,33 @@ Actual scripts are located under `/opt/okeutil/`:
 - same as `helm` and will detect if the tunnel has been established and establish if not
 
 `oapply`
-- perform `kubectl apply -f` for all supplied yaml files
+- perform `kubectl apply -f` for all supplied yaml files or URLs
 - detect if the tunnel has been established and establish if not
 - e.g. `oapply pod1.yaml pod2.yaml` will apply both resource of pod1 and pod2
+- e.g. `oapply https://example.com/manifest.yaml` will apply a manifest from a URL
 
 `odelete`
-- perform `kubectl delete -f` for all supplied yaml files
+- perform `kubectl delete -f` for all supplied yaml files or URLs
 - detect if the tunnel has been established and establish if not
 - e.g. `odelete pod1.yaml pod2.yaml` will delete both resource of pod1 and pod2
+- e.g. `odelete https://example.com/manifest.yaml` will delete a manifest from a URL
+
+`ssh2pod`
+- exec into the latest running pod whose name matches a keyword
+- detect if the tunnel has been established and establish if not
+- e.g. `ssh2pod myapp default` will open a shell in the latest running pod matching `myapp` in the `default` namespace
+- e.g. `ssh2pod myapp default mycontainer` to target a specific container
+
+`getpodlog`
+- show logs for the latest running pod whose name matches a keyword
+- detect if the tunnel has been established and establish if not
+- e.g. `getpodlog myapp default` will print logs for the latest running pod matching `myapp` in the `default` namespace
+- e.g. `getpodlog myapp default mycontainer` to fetch logs from a specific container
 
 ## Customization
 
 ### Source
-Source files are under `.devdevcontainer/`
+Source files are under `.devcontainer/`
 
 ### Build from Source
 To build your own image (for customization) when creating the codespace:
@@ -148,7 +163,7 @@ To build your own image (for customization) when creating the codespace:
 ## Known Issues
 1. Occasionally, the OKE tunnel will just cannot be established and hang:
     ```
-    [oracle@codespaces-a12345 ~]$ /opt/okeutl/check-oke-connection.sh 
+    [oracle@codespaces-a12345 ~]$ /opt/okeutil/check-oke-connection.sh 
     Initiating connection to OKE cluster at Sat Mar 25 00:00:00 UTC 2023...
     nohup: appending output to 'nohup.out'
     * Retrying in 5s...
