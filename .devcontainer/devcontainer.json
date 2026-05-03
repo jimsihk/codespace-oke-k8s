@@ -1,5 +1,6 @@
 {
   "build": { "dockerfile": "Dockerfile" },
+  "postStartCommand": "/opt/okeutil/restore-from-secrets.sh",
   "customizations": {
     "vscode": {
         "extensions": [
