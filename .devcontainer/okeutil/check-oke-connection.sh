@@ -30,27 +30,27 @@ then
     TUNNEL_PID=$!
     while true
     do
-      kubectl get nodes > /dev/null 2>&1
-      STATUS=$?
-      if [ $STATUS -eq 0 ]
-      then
-        echo '*'" Connection is ready at $(date)"
-        break;
-      elif ! kill -0 "$TUNNEL_PID" 2>/dev/null
-      then
-        TUNNEL_RESTARTS=$((TUNNEL_RESTARTS + 1))
-        if [ $TUNNEL_RESTARTS -gt $TUNNEL_MAX_RESTARTS ]
+        kubectl get nodes > /dev/null 2>&1
+        STATUS=$?
+        if [ $STATUS -eq 0 ]
         then
-          echo "* ERROR! Tunnel failed after $TUNNEL_MAX_RESTARTS restart(s)"
-          exit 1
+            echo '*'" Connection is ready at $(date)"
+            break;
+        elif ! kill -0 "$TUNNEL_PID" 2>/dev/null
+        then
+            TUNNEL_RESTARTS=$((TUNNEL_RESTARTS + 1))
+            if [ $TUNNEL_RESTARTS -gt $TUNNEL_MAX_RESTARTS ]
+            then
+                echo "* ERROR! Tunnel failed after $TUNNEL_MAX_RESTARTS restart(s)"
+                exit 1
+            fi
+            echo "* Tunnel process ended, restarting (attempt $TUNNEL_RESTARTS of $TUNNEL_MAX_RESTARTS)..."
+            nohup "$TUNNELSCRIPT" 2>&1 &
+            TUNNEL_PID=$!
+        else
+            echo '* Retrying in 5s...'
+            sleep 5
         fi
-        echo "* Tunnel process ended, restarting (attempt $TUNNEL_RESTARTS of $TUNNEL_MAX_RESTARTS)..."
-        nohup "$TUNNELSCRIPT" 2>&1 &
-        TUNNEL_PID=$!
-      else
-        echo '* Retrying in 5s...'
-        sleep 5
-      fi
     done
 else
   # no news is good news

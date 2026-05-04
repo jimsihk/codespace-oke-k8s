@@ -63,6 +63,10 @@ PRIVATE_KEY=$(grep PRIVATE_KEY ~/.oci/custom-bastion-config | cut -d'=' -f2)
 TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2)
 TAEGET_PORT=6443
 
+# Retry on OCI session timeout (configurable; default: true)
+SSH_RETRY_ON_TIMEOUT=$(grep SSH_RETRY_ON_TIMEOUT ~/.oci/custom-bastion-config | cut -d'=' -f2)
+SSH_RETRY_ON_TIMEOUT="${SSH_RETRY_ON_TIMEOUT:-true}"
+
 ################################
 # Step 0d: Fix key permission
 ################################
@@ -131,16 +135,48 @@ echo '* Running: '"$SSHCOMMAND"
 SSH_MAX_ATTEMPTS=5
 SSH_RETRY_DELAY=15
 SSH_ATTEMPT=1
+SSH_LOG=$(mktemp)
 while [ $SSH_ATTEMPT -le $SSH_MAX_ATTEMPTS ]
 do
   echo "* SSH attempt $SSH_ATTEMPT of $SSH_MAX_ATTEMPTS..."
-  $SSHCOMMAND
+  # Capture stderr (verbose SSH output) to a temp log while still displaying it
+  $SSHCOMMAND 2> >(tee "$SSH_LOG" >&2)
   SSH_EXIT=$?
   if [ $SSH_EXIT -eq 0 ]
   then
     break
   fi
   echo "* SSH failed with exit code $SSH_EXIT"
+
+  # Determine whether to retry based on the error type
+  SHOULD_RETRY=false
+  if grep -qE "(No more authentication methods to try|Permission denied \(publickey\))" "$SSH_LOG"
+  then
+    # Authentication failure (e.g. "Permission denied (publickey)") - always retry
+    echo "* Detected authentication failure, will retry..."
+    SHOULD_RETRY=true
+  elif grep -qE "(channel [0-9]+: open failed|Connection closed by|Connection timed out|Broken pipe)" "$SSH_LOG"
+  then
+    # OCI session timeout or connection reset
+    if [ "$SSH_RETRY_ON_TIMEOUT" = "true" ]
+    then
+      echo "* Detected session timeout/disconnect, will retry (SSH_RETRY_ON_TIMEOUT=true)..."
+      SHOULD_RETRY=true
+    else
+      echo "* Detected session timeout/disconnect but SSH_RETRY_ON_TIMEOUT=false, stopping."
+    fi
+  fi
+
+  # Truncate log for the next attempt
+  > "$SSH_LOG"
+
+  if [ "$SHOULD_RETRY" = "false" ]
+  then
+    echo "* ERROR! SSH tunnel stopped with an unretryable error"
+    rm -f "$SSH_LOG"
+    exit 1
+  fi
+
   SSH_ATTEMPT=$((SSH_ATTEMPT + 1))
   if [ $SSH_ATTEMPT -le $SSH_MAX_ATTEMPTS ]
   then
@@ -148,6 +184,7 @@ do
     sleep $SSH_RETRY_DELAY
   fi
 done
+rm -f "$SSH_LOG"
 
 if [ $SSH_ATTEMPT -gt $SSH_MAX_ATTEMPTS ]
 then

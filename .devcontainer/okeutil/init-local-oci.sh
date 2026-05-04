@@ -92,6 +92,8 @@ else
   read -r TARGET_IP
   echo "BASTION_ID=$BASTION_ID" >> ~/.oci/custom-bastion-config
   echo "TARGET_IP=$TARGET_IP" >> ~/.oci/custom-bastion-config
+  # Retry SSH when OCI session times out (set to false to disable timeout-based retries)
+  echo "SSH_RETRY_ON_TIMEOUT=true" >> ~/.oci/custom-bastion-config
   echo '*'" Created ~/.oci/custom-bastion-config "'*'
 fi
 
