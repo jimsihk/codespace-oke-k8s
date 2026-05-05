@@ -52,6 +52,21 @@ echo "Clean oci-emulator"
 docker kill "${OCI_CONTAINER_ID}"
 echo "....."
 
+echo "=====Test SSH retry logic====="
+docker run --rm \
+  -v $(pwd)/test_ssh_retry.sh:/mnt/test.sh \
+  "${TEST_IMAGE}" \
+  "cp /mnt/test.sh test.sh && chmod +x test.sh && ./test.sh; exit \$?"
+STATUS="$?"
+if [ "${STATUS}" -eq 0 ]; then
+  echo "Passed"
+else
+  echo "Failed"
+  exit "${STATUS}"
+fi
+unset STATUS
+echo "....."
+
 echo "=====Test entrypoint====="
 CONTAINER_ID=$(docker run --rm -d "${TEST_IMAGE}")
 docker ps

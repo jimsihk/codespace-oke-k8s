@@ -61,7 +61,7 @@ PRIVATE_KEY=$(grep PRIVATE_KEY ~/.oci/custom-bastion-config | cut -d'=' -f2)
 # Replace with values of Kubernetes API private endpoint (or the IP of the nodes)
 # Beware to have the bastion in the VCN
 TARGET_IP=$(grep TARGET_IP ~/.oci/custom-bastion-config | cut -d'=' -f2)
-TAEGET_PORT=6443
+TARGET_PORT=6443
 
 # Retry on OCI session timeout (configurable; default: true)
 SSH_RETRY_ON_TIMEOUT=$(grep SSH_RETRY_ON_TIMEOUT ~/.oci/custom-bastion-config | cut -d'=' -f2)
@@ -92,7 +92,7 @@ fi
 if [ -z "$1" ]
 then
 	echo '* '"Creating Bastion session with $BASTION_ID..."
-	GETSESSIONCOMMAND="oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file $PUBLIC_KEY --key-type PUB --target-private-ip $TARGET_IP --target-port $TAEGET_PORT"
+	GETSESSIONCOMMAND="oci bastion session create-port-forwarding --bastion-id $BASTION_ID --display-name sdw-to-oke-tunnel --ssh-public-key-file $PUBLIC_KEY --key-type PUB --target-private-ip $TARGET_IP --target-port $TARGET_PORT"
 	RESULT1=$($GETSESSIONCOMMAND)
 	echo "$RESULT1"
 

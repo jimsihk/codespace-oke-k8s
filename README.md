@@ -114,6 +114,12 @@ Actual scripts are located under `/opt/okeutil/`:
 
 `oke-tunnel.sh`
 - establish the SSH tunnel to the K8S API endpoint, run with `nohup oke-tunnel.sh &` to establish the tunnel in the background
+- automatically retries the SSH connection on failure; behaviour is controlled by `SSH_RETRY_ON_TIMEOUT` in `~/.oci/custom-bastion-config` (written by `init-local-oci.sh`, default: `true`):
+  | Error type | `SSH_RETRY_ON_TIMEOUT=true` | `SSH_RETRY_ON_TIMEOUT=false` |
+  |---|---|---|
+  | Authentication failure (`Permission denied (publickey)`) | Always retries | Always retries |
+  | Session timeout / disconnect (`Connection timed out`, `Broken pipe`, ...) | Retries | Stops immediately |
+  | Any other SSH error | Stops immediately | Stops immediately |
 
 `check-oke-connection.sh`
 - check if the SSH tunnel has been established and establish if not
@@ -179,7 +185,7 @@ To build your own image (for customization) when creating the codespace:
     debug1: No more authentication methods to try.
     ocid1.bastionsession.oc1.eu-zurich-1.a12345678@host.bastion.eu-zurich-1.oci.oraclecloud.com: Permission denied (publickey).
     ```
-- Don't panic, just cancel the command (`Ctrl c`) and rerun, it would then work
+- `oke-tunnel.sh` will automatically retry on this authentication failure. If it keeps failing after the maximum number of retries, cancel the command (`Ctrl c`) and rerun.
 
 ## Credits
 Based on [Oracle oci-cli Docker Image](https://github.com/oracle/docker-images/tree/main/OracleCloudInfrastructure/oci-cli)
